@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>PLANO GOINFRA 2026 - 2030</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+    }
+
+    #app {
+      display: grid;
+      grid-template-columns: 360px 1fr 320px;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    #sidebar-left,
+    #sidebar-right {
+      height: 100vh;
+      overflow-y: auto;
+      background: #ffffff;
+      padding: 16px;
+    }
+
+    #sidebar-left {
+      border-right: 1px solid #d1d5db;
+    }
+
+    #sidebar-right {
+      border-left: 1px solid #d1d5db;
+    }
+
+    #map-wrap {
+      min-width: 0;
+      height: 100vh;
+    }
+
+    #map {
+      width: 100%;
+      height: 100%;
+    }
+
+    .titulo {
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 14px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e7eb;
+      color: #111827;
+    }
+
+    .bloco {
+      margin-bottom: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .bloco:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+
+    .subtitulo {
+      font-size: 13px;
+      font-weight: 700;
+      color: #111827;
+      margin: 0 0 8px 0;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #111827;
+    }
+
+    select, button {
+      width: 100%;
+      padding: 9px 10px;
+      font-size: 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background: #fff;
+      margin-bottom: 10px;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .programas {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .programa-btn {
+      border: 1px solid #9ca3af;
+      background: #f3f4f6;
+      padding: 10px 4px;
+      cursor: pointer;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .programa-btn.ativo-filtro {
+      background: #1f2937;
+      color: #ffffff;
+      border-color: #1f2937;
+    }
+
+    .programa-btn.ativo-municipio {
+      background: #d4af37;
+      color: #000000;
+      border-color: #a07f14;
+    }
+
+    .servicos-lineares {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .servico-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #111827;
+    }
+
+    .servico-item input {
+      margin: 0;
+    }
+
+    .contador {
+      font-size: 13px;
+      line-height: 1.6;
+      color: #374151;
+    }
+
+    .legenda-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+      font-size: 13px;
+      color: #111827;
+    }
+
+    .legenda-linha {
+      width: 24px;
+      height: 5px;
+      display: inline-block;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .legenda-simbolo {
+      width: 14px;
+      height: 14px;
+      display: inline-block;
+      margin-right: 8px;
+      border: 1px solid #000;
+      transform: rotate(45deg);
+      flex-shrink: 0;
+    }
+
+    .obs {
+      font-size: 12px;
+      color: #6b7280;
+      line-height: 1.5;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 1200px) {
+      #app {
+        grid-template-columns: 320px 1fr 280px;
+      }
+    }
+
+    @media (max-width: 980px) {
+      #app {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+      }
+
+      #sidebar-left,
+      #sidebar-right {
+        height: auto;
+        max-height: 32vh;
+      }
+
+      #sidebar-left {
+        border-right: none;
+        border-bottom: 1px solid #d1d5db;
+      }
+
+      #sidebar-right {
+        border-left: none;
+        border-top: 1px solid #d1d5db;
+      }
+
+      #map-wrap {
+        height: 36vh;
+      }
+    }
+  </style>
+
+</head>
+<body>
+<div id="app">
+  <aside id="sidebar-left">
+    <div class="titulo">PLANO GOINFRA 2026 - 2030</div>
+
+```
+<div class="bloco">
+  <div class="subtitulo">Filtros</div>
+
+  <label for="rgPlanSelect">Região de Planejamento</label>
+  <select id="rgPlanSelect">
+    <option value="">Todas</option>
+  </select>
+
+  <label for="municipioSelect">Município</label>
+  <select id="municipioSelect">
+    <option value="">Todos</option>
+  </select>
+
+  <div class="subtitulo">Programas municipais</div>
+  <div class="programas">
+    <button class="programa-btn" data-programa="GME" type="button">GME</button>
+    <button class="programa-btn" data-programa="GMK" type="button">GMK</button>
+    <button class="programa-btn" data-programa="GMM" type="button">GMM</button>
+    <button class="programa-btn" data-programa="GMP" type="button">GMP</button>
+    <button class="programa-btn" data-programa="GPP" type="button">GPP</button>
+    <button class="programa-btn" data-programa="PMR" type="button">PMR</button>
+  </div>
+
+  <div class="subtitulo">Serviços lineares</div>
+  <div class="servicos-lineares">
+    <label class="servico-item"><input type="checkbox" class="servico-linear" value="DPJ" checked> Projetos</label>
+    <label class="servico-item"><input type="checkbox" class="servico-linear" value="TES_LIC" checked> Tesouro Licitação</label>
+    <label class="servico-item"><input type="checkbox" class="servico-linear" value="TES_AND" checked> Tesouro em Andamento</label>
+    <label class="servico-item"><input type="checkbox" class="servico-linear" value="FUN_AND" checked> FUNDEINFRA em Andamento</label>
+    <label class="servico-item"><input type="checkbox" class="servico-linear" value="FUN_LIC" checked> FUNDEINFRA em Licitação</label>
+    <label class="servico-item"><input type="checkbox" class="servico-linear" value="FEDER" checked> Federalização</label>
+    <label class="servico-item"><input type="checkbox" class="servico-linear" value="MICRO" checked> Microrrevestimento</label>
+  </div>
+
+  <div class="subtitulo">Obras de Arte Especiais</div>
+  <div class="servicos-lineares">
+    <label class="servico-item"><input type="checkbox" id="toggleOAE" checked> Exibir OAE</label>
+  </div>
+
+  <button id="aplicarFiltros" type="button">Aplicar filtros</button>
+  <button id="limparFiltro" type="button">Limpar</button>
+
+  <div class="contador">
+    Municípios: <span id="countMunicipios">0</span><br>
+    Linhas: <span id="countLinhas">0</span><br>
+    OAE: <span id="countOAE">0</span>
+  </div>
+</div>
+```
+
+  </aside>
+
+  <main id="map-wrap">
+    <div id="map"></div>
+  </main>
+
+  <aside id="sidebar-right">
+    <div class="bloco">
+      <div class="subtitulo">Legenda — Serviços lineares</div>
+      <div class="legenda-item"><span class="legenda-linha" style="background:#ff0000;"></span>Pavimentação</div>
+      <div class="legenda-item"><span class="legenda-linha" style="background:#0000ff;"></span>Duplicação</div>
+      <div class="legenda-item"><span class="legenda-linha" style="background:#00d61f;"></span>Restauração</div>
+      <div class="legenda-item"><span class="legenda-linha" style="background:#f39c12;"></span>Melhoria Funcional</div>
+      <div class="legenda-item"><span class="legenda-linha" style="background:#d9ef22;"></span>Federalização</div>
+      <div class="legenda-item"><span class="legenda-linha" style="background:#e44de8;"></span>Microrrevestimento</div>
+      <div class="obs">Os filtros por Projetos, Tesouro, FUNDEINFRA, Federalização e Microrrevestimento continuam independentes. A cor da linha representa o tipo/camada visível no momento.</div>
+    </div>
+
+```
+<div class="bloco">
+  <div class="subtitulo">Legenda — Obras de Arte Especiais</div>
+  <div class="legenda-item"><span class="legenda-simbolo" style="background:#00ffff;"></span>Eixo 1</div>
+  <div class="legenda-item"><span class="legenda-simbolo" style="background:#ffff00;"></span>Eixo 2</div>
+  <div class="legenda-item"><span class="legenda-simbolo" style="background:#ff0000;"></span>Eixo 3</div>
+  <div class="legenda-item"><span class="legenda-simbolo" style="background:#2f80ed;"></span>Eixo 4</div>
+  <div class="legenda-item"><span class="legenda-simbolo" style="background:#00ff00;"></span>Eixo 5</div>
+  <div class="legenda-item"><span class="legenda-simbolo" style="background:#ff4dc4;"></span>Eixo 6</div>
+  <div class="legenda-item"><span class="legenda-simbolo" style="background:#8B5A00;"></span>Bueiro</div>
+  <div class="legenda-item"><span class="legenda-simbolo" style="background:#999999;"></span>Viaduto</div>
+</div>
+```
+
+  </aside>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+  var map = L.map('map').setView([-16.5, -49.5], 7);
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  var municipiosData = null;
+  var sreData = null;
+  var oaeData = null;
+
+  var municipiosLayer = null;
+  var destaqueLayer = null;
+  var oaeLayer = null;
+
+  var sreLayers = {
+    pavimentacao: null,
+    duplicacao: null,
+    restauracao: null,
+    melhoria: null,
+    federalizacao: null,
+    microrrevestimento: null
+  };
+
+  var programaAtivo = '';
+  var programas = ['GME', 'GMK', 'GMM', 'GMP', 'GPP', 'PMR'];
+
+  function valorSeguro(obj, campo) {
+    if (!obj || !obj.properties) return '';
+    if (obj.properties[campo] === null || obj.properties[campo] === undefined) return '';
+    return obj.properties[campo];
+  }
+
+  function textoTemValor(v) {
+    if (v === null || v === undefined) return false;
+    return String(v).trim() !== '';
+  }
+
+  function numeroPrograma(feature, campo) {
+    var v = valorSeguro(feature, campo);
+    if (v === '') return 0;
+    return Number(v);
+  }
+
+  function valorEhUm(v) {
+    if (v === null || v === undefined) return false;
+    return String(v).trim() === '1' || Number(v) === 1;
+  }
+
+  function valorPMRAtivo(v) {
+    if (v === null || v === undefined) return false;
+    var t = String(v).trim();
+    if (t === '' || t === '0') return false;
+    return true;
+  }
+
+  function corOAE(eixo) {
+    eixo = Number(eixo);
+    if (eixo === 1) return '#00ffff';
+    if (eixo === 2) return '#ffff00';
+    if (eixo === 3) return '#ff0000';
+    if (eixo === 4) return '#2f80ed';
+    if (eixo === 5) return '#00ff00';
+    if (eixo === 6) return '#ff4dc4';
+    if (eixo === 100) return '#8B5A00';
+    if (eixo === 101) return '#999999';
+    return '#cccccc';
+  }
+
+  function nomeTipoOAE(eixo) {
+    eixo = Number(eixo);
+    if (eixo === 1) return 'Eixo 1';
+    if (eixo === 2) return 'Eixo 2';
+    if (eixo === 3) return 'Eixo 3';
+    if (eixo === 4) return 'Eixo 4';
+    if (eixo === 5) return 'Eixo 5';
+    if (eixo === 6) return 'Eixo 6';
+    if (eixo === 100) return 'Bueiro';
+    if (eixo === 101) return 'Viaduto';
+    return 'Outro';
+  }
+
+  function marcadorLosango(latlng, cor) {
+    return L.marker(latlng, {
+      icon: L.divIcon({
+        className: '',
+        html:
+          '<div style="' +
+          'width:12px;' +
+          'height:12px;' +
+          'background:' + cor + ';' +
+          'border:2px solid #000;' +
+          'transform: rotate(45deg);' +
+          'box-sizing:border-box;' +
+          '"></div>',
+        iconSize: [16, 16],
+        iconAnchor: [8, 8]
+      })
+    });
+  }
+
+  function preencherRGPlan() {
+    var select = document.getElementById('rgPlanSelect');
+    var valores = [];
+    var i, rg, f;
+
+    for (i = 0; i < municipiosData.features.length; i++) {
+      f = municipiosData.features[i];
+      rg = valorSeguro(f, 'RG_PLAN');
+      if (rg && valores.indexOf(rg) === -1) {
+        valores.push(rg);
+      }
+    }
+
+    valores.sort(function(a, b) {
+      return String(a).localeCompare(String(b), 'pt-BR');
+    });
+
+    for (i = 0; i < valores.length; i++) {
+      var opt = document.createElement('option');
+      opt.value = valores[i];
+      opt.textContent = valores[i];
+      select.appendChild(opt);
+    }
+  }
+
+  function preencherMunicipios() {
+    var select = document.getElementById('municipioSelect');
+    var nomes = [];
+    var i, nome, f;
+
+    select.innerHTML = '<option value="">Todos</option>';
+
+    for (i = 0; i < municipiosData.features.length; i++) {
+      f = municipiosData.features[i];
+      nome = valorSeguro(f, 'NM_MUN');
+      if (nome && nomes.indexOf(nome) === -1) {
+        nomes.push(nome);
+      }
+    }
+
+    nomes.sort(function(a, b) {
+      return String(a).localeCompare(String(b), 'pt-BR');
+    });
+
+    for (i = 0; i < nomes.length; i++) {
+      var opt = document.createElement('option');
+      opt.value = nomes[i];
+      opt.textContent = nomes[i];
+      select.appendChild(opt);
+    }
+  }
+
+  function atualizarMunicipiosPorRegiao() {
+    var rgSelecionada = document.getElementById('rgPlanSelect').value;
+    var select = document.getElementById('municipioSelect');
+    var nomes = [];
+    var i, nome, rg, f;
+
+    select.innerHTML = '<option value="">Todos</option>';
+
+    for (i = 0; i < municipiosData.features.length; i++) {
+      f = municipiosData.features[i];
+      nome = valorSeguro(f, 'NM_MUN');
+      rg = valorSeguro(f, 'RG_PLAN');
+
+      if (nome && (!rgSelecionada || rg === rgSelecionada) && nomes.indexOf(nome) === -1) {
+        nomes.push(nome);
+      }
+    }
+
+    nomes.sort(function(a, b) {
+      return String(a).localeCompare(String(b), 'pt-BR');
+    });
+
+    for (i = 0; i < nomes.length; i++) {
+      var opt = document.createElement('option');
+      opt.value = nomes[i];
+      opt.textContent = nomes[i];
+      select.appendChild(opt);
+    }
+  }
+
+  function resetarBotoesPrograma() {
+    var botoes = document.querySelectorAll('.programa-btn');
+    var i;
+    for (i = 0; i < botoes.length; i++) {
+      botoes[i].classList.remove('ativo-filtro');
+      botoes[i].classList.remove('ativo-municipio');
+    }
+  }
+
+  function atualizarIndicadoresProgramaMunicipio(nomeMunicipio) {
+    resetarBotoesPrograma();
+
+    if (!nomeMunicipio) {
+      if (programaAtivo) {
+        var botaoFiltro = document.querySelector('.programa-btn[data-programa="' + programaAtivo + '"]');
+        if (botaoFiltro) botaoFiltro.classList.add('ativo-filtro');
+      }
+      return;
+    }
+
+    var i, f, nome;
+    var municipioFeature = null;
+
+    for (i = 0; i < municipiosData.features.length; i++) {
+      f = municipiosData.features[i];
+      nome = valorSeguro(f, 'NM_MUN');
+      if (nome === nomeMunicipio) {
+        municipioFeature = f;
+        break;
+      }
+    }
+
+    if (!municipioFeature) return;
+
+    for (i = 0; i < programas.length; i++) {
+      var prog = programas[i];
+      var botao = document.querySelector('.programa-btn[data-programa="' + prog + '"]');
+      if (botao && numeroPrograma(municipioFeature, prog) > 0) {
+        botao.classList.add('ativo-municipio');
+      }
+    }
+  }
+
+  function servicosLinearesSelecionados() {
+    var checks = document.querySelectorAll('.servico-linear');
+    var ativos = {};
+    var i;
+
+    for (i = 0; i < checks.length; i++) {
+      ativos[checks[i].value] = checks[i].checked;
+    }
+
+    return ativos;
+  }
+
+  function oaeAtiva() {
+    return document.getElementById('toggleOAE').checked;
+  }
+
+  function municipiosFiltrados() {
+    var rg = document.getElementById('rgPlanSelect').value;
+    var municipio = document.getElementById('municipioSelect').value;
+    var i, f, nome, rgPlan;
+    var lista = [];
+
+    for (i = 0; i < municipiosData.features.length; i++) {
+      f = municipiosData.features[i];
+      nome = valorSeguro(f, 'NM_MUN');
+      rgPlan = valorSeguro(f, 'RG_PLAN');
+
+      if (rg && rgPlan !== rg) continue;
+      if (municipio && nome !== municipio) continue;
+      if (programaAtivo && numeroPrograma(f, programaAtivo) <= 0) continue;
+
+      lista.push(f);
+    }
+
+    return lista;
+  }
+
+  function desenharMunicipiosBase() {
+    if (municipiosLayer) map.removeLayer(municipiosLayer);
+
+    municipiosLayer = L.geoJSON(municipiosData, {
+      style: function() {
+        return {
+          color: '#666666',
+          weight: 1,
+          fillColor: '#ffffff',
+          fillOpacity: 0.05
+        };
+      },
+      onEachFeature: function(feature, layer) {
+        var nome = valorSeguro(feature, 'NM_MUN');
+        var rg = valorSeguro(feature, 'RG_PLAN');
+        layer.bindPopup('<b>Município:</b> ' + nome + '<br><b>RG_PLAN:</b> ' + rg);
+      }
+    }).addTo(map);
+  }
+
+  function desenharDestaqueMunicipios(features) {
+    if (destaqueLayer) {
+      map.removeLayer(destaqueLayer);
+      destaqueLayer = null;
+    }
+
+    destaqueLayer = L.geoJSON({
+      type: 'FeatureCollection',
+      features: features
+    }, {
+      style: function() {
+        return {
+          color: '#000000',
+          weight: 2,
+          fillColor: '#ffff00',
+          fillOpacity: 0.18
+        };
+      }
+    }).addTo(map);
+  }
+
+  function limparCamadasSRE() {
+    for (var chave in sreLayers) {
+      if (sreLayers[chave]) {
+        map.removeLayer(sreLayers[chave]);
+        sreLayers[chave] = null;
+      }
+    }
+  }
+
+  function linhaTemCategoria(feature, categoria, ativos) {
+    var dpj = valorSeguro(feature, 'DPJ.SV');
+    var tesLic = valorSeguro(feature, 'TES.LIC.SV');
+    var tesAnd = valorSeguro(feature, 'TES.AND.SV');
+    var funAnd = valorSeguro(feature, 'FUN.AND.SV');
+    var funLic = valorSeguro(feature, 'FUN.LIC.SV');
+    var feder = valorSeguro(feature, 'FEDER');
+    var pmr = valorSeguro(feature, 'PMR');
+
+    function baseAtivaPorTipo(tipo) {
+      if (ativos.DPJ && dpj === tipo) return true;
+      if (ativos.TES_LIC && tesLic === tipo) return true;
+      if (ativos.TES_AND && tesAnd === tipo) return true;
+      if (ativos.FUN_AND && funAnd === tipo) return true;
+      if (ativos.FUN_LIC && funLic === tipo) return true;
+      return false;
+    }
+
+    if (categoria === 'pavimentacao') return baseAtivaPorTipo('Pavimentação');
+    if (categoria === 'duplicacao') return baseAtivaPorTipo('Duplicação');
+    if (categoria === 'restauracao') return baseAtivaPorTipo('Restauração');
+    if (categoria === 'melhoria') return baseAtivaPorTipo('Melhoria Funcional');
+    if (categoria === 'federalizacao') return ativos.FEDER && valorEhUm(feder);
+    if (categoria === 'microrrevestimento') return ativos.MICRO && valorPMRAtivo(pmr);
+
+    return false;
+  }
+
+  function descricaoServicosLinha(feature) {
+    var partes = [];
+
+    var dpj = valorSeguro(feature, 'DPJ.SV');
+    var tesLic = valorSeguro(feature, 'TES.LIC.SV');
+    var tesAnd = valorSeguro(feature, 'TES.AND.SV');
+    var funAnd = valorSeguro(feature, 'FUN.AND.SV');
+    var funLic = valorSeguro(feature, 'FUN.LIC.SV');
+    var feder = valorSeguro(feature, 'FEDER');
+    var pmr = valorSeguro(feature, 'PMR');
+
+    if (textoTemValor(dpj)) partes.push('Projetos: ' + dpj);
+    if (textoTemValor(tesLic)) partes.push('Tesouro Licitação: ' + tesLic);
+    if (textoTemValor(tesAnd)) partes.push('Tesouro em Andamento: ' + tesAnd);
+    if (textoTemValor(funAnd)) partes.push('FUNDEINFRA em Andamento: ' + funAnd);
+    if (textoTemValor(funLic)) partes.push('FUNDEINFRA em Licitação: ' + funLic);
+    if (valorEhUm(feder)) partes.push('Federalização');
+    if (valorPMRAtivo(pmr)) partes.push('Microrrevestimento');
+
+    if (partes.length === 0) return 'Sem serviço classificado';
+    return partes.join('<br>');
+  }
+
+  function construirPopupLinha(feature) {
+    var p = feature.properties || {};
+    return (
+      '<b>SRE:</b> ' + (p.sre || p.SRE || '') + '<br>' +
+      '<b>Município:</b> ' + (p.NM_MUN || '') + '<br>' +
+      '<b>Rodovia:</b> ' + (p.rodovia || '') + '<br>' +
+      '<b>Trecho:</b> ' + (p.trecho_go || '') + '<br><br>' +
+      '<b>Serviços:</b><br>' + descricaoServicosLinha(feature)
+    );
+  }
+
+  function construirLayerCategoria(features, cor) {
+    return L.geoJSON({
+      type: 'FeatureCollection',
+      features: features
+    }, {
+      style: function() {
+        return {
+          color: cor,
+          weight: 4.55,
+          opacity: 0.95
+        };
+      },
+      onEachFeature: function(feature, layer) {
+        layer.bindPopup(construirPopupLinha(feature));
+      }
+    }).addTo(map);
+  }
+
+  function desenharLinhasEPontos(featuresMunicipios) {
+    limparCamadasSRE();
+    if (oaeLayer) {
+      map.removeLayer(oaeLayer);
+      oaeLayer = null;
+    }
+
+    var nomesMunicipios = [];
+    var i, f, nome;
+
+    for (i = 0; i < featuresMunicipios.length; i++) {
+      nome = valorSeguro(featuresMunicipios[i], 'NM_MUN');
+      if (nome && nomesMunicipios.indexOf(nome) === -1) {
+        nomesMunicipios.push(nome);
+      }
+    }
+
+    var haFiltroMunicipal = nomesMunicipios.length > 0 && nomesMunicipios.length < municipiosData.features.length;
+    var ativosServico = servicosLinearesSelecionados();
+
+    var linhasBase = [];
+    for (i = 0; i < sreData.features.length; i++) {
+      f = sreData.features[i];
+      nome = valorSeguro(f, 'NM_MUN');
+
+      if (!haFiltroMunicipal || nomesMunicipios.indexOf(nome) >= 0) {
+        linhasBase.push(f);
+      }
+    }
+
+    var pavimentacao = [];
+    var duplicacao = [];
+    var restauracao = [];
+    var melhoria = [];
+    var federalizacao = [];
+    var microrrevestimento = [];
+
+    var idsUnicos = {};
+
+    function idLinha(feature, idx) {
+      var props = feature.properties || {};
+      return props.SRE_MUN_ID || props.SRE_ID || props.SRE_MUN || props.sre || props.SRE || ('idx_' + idx);
+    }
+
+    for (i = 0; i < linhasBase.length; i++) {
+      f = linhasBase[i];
+      var exibiu = false;
+
+      if (linhaTemCategoria(f, 'pavimentacao', ativosServico)) {
+        pavimentacao.push(f);
+        exibiu = true;
+      }
+      if (linhaTemCategoria(f, 'duplicacao', ativosServico)) {
+        duplicacao.push(f);
+        exibiu = true;
+      }
+      if (linhaTemCategoria(f, 'restauracao', ativosServico)) {
+        restauracao.push(f);
+        exibiu = true;
+      }
+      if (linhaTemCategoria(f, 'melhoria', ativosServico)) {
+        melhoria.push(f);
+        exibiu = true;
+      }
+      if (linhaTemCategoria(f, 'federalizacao', ativosServico)) {
+        federalizacao.push(f);
+        exibiu = true;
+      }
+      if (linhaTemCategoria(f, 'microrrevestimento', ativosServico)) {
+        microrrevestimento.push(f);
+        exibiu = true;
+      }
+
+      if (exibiu) {
+        idsUnicos[idLinha(f, i)] = true;
+      }
+    }
+
+    if (pavimentacao.length) sreLayers.pavimentacao = construirLayerCategoria(pavimentacao, '#ff0000');
+    if (duplicacao.length) sreLayers.duplicacao = construirLayerCategoria(duplicacao, '#0000ff');
+    if (restauracao.length) sreLayers.restauracao = construirLayerCategoria(restauracao, '#00d61f');
+    if (melhoria.length) sreLayers.melhoria = construirLayerCategoria(melhoria, '#f39c12');
+    if (federalizacao.length) sreLayers.federalizacao = construirLayerCategoria(federalizacao, '#d9ef22');
+    if (microrrevestimento.length) sreLayers.microrrevestimento = construirLayerCategoria(microrrevestimento, '#e44de8');
+
+    var pontos = [];
+    if (oaeAtiva()) {
+      for (i = 0; i < oaeData.features.length; i++) {
+        f = oaeData.features[i];
+        nome = valorSeguro(f, 'NM_MUN');
+
+        if (!haFiltroMunicipal || nomesMunicipios.indexOf(nome) >= 0) {
+          pontos.push(f);
+        }
+      }
+
+      oaeLayer = L.geoJSON({
+        type: 'FeatureCollection',
+        features: pontos
+      }, {
+        pointToLayer: function(feature, latlng) {
+          return marcadorLosango(latlng, corOAE(valorSeguro(feature, 'EIXO')));
+        },
+        onEachFeature: function(feature, layer) {
+          var p = feature.properties || {};
+          layer.bindPopup(
+            '<b>OAE:</b> ' + (p.NOME || p.NM_OAE || p.DESCRICAO || '') + '<br>' +
+            '<b>Município:</b> ' + (p.NM_MUN || '') + '<br>' +
+            '<b>SRE:</b> ' + (p.SRE || '') + '<br>' +
+            '<b>Eixo:</b> ' + nomeTipoOAE(p.EIXO)
+          );
+        }
+      }).addTo(map);
+    }
+
+    document.getElementById('countMunicipios').textContent = featuresMunicipios.length;
+    document.getElementById('countLinhas').textContent = Object.keys(idsUnicos).length;
+    document.getElementById('countOAE').textContent = pontos.length;
+
+    var camadas = [];
+    if (destaqueLayer) camadas.push(destaqueLayer);
+    for (var chave in sreLayers) {
+      if (sreLayers[chave]) camadas.push(sreLayers[chave]);
+    }
+    if (oaeLayer) camadas.push(oaeLayer);
+
+    var grupo = L.featureGroup(camadas);
+    if (grupo.getBounds().isValid()) {
+      map.fitBounds(grupo.getBounds(), {
+        paddingTopLeft: [30, 30],
+        paddingBottomRight: [30, 30]
+      });
+    }
+  }
+
+  function aplicarFiltros() {
+    var feats = municipiosFiltrados();
+    var municipioSelecionado = document.getElementById('municipioSelect').value;
+
+    desenharDestaqueMunicipios(feats);
+    desenharLinhasEPontos(feats);
+    atualizarIndicadoresProgramaMunicipio(municipioSelecionado);
+  }
+
+  function limparTudo() {
+    document.getElementById('rgPlanSelect').value = '';
+    document.getElementById('municipioSelect').value = '';
+    document.getElementById('toggleOAE').checked = true;
+    programaAtivo = '';
+    resetarBotoesPrograma();
+
+    var checks = document.querySelectorAll('.servico-linear');
+    var i;
+    for (i = 0; i < checks.length; i++) {
+      checks[i].checked = true;
+    }
+
+    atualizarMunicipiosPorRegiao();
+    aplicarFiltros();
+  }
+
+  document.getElementById('rgPlanSelect').addEventListener('change', function() {
+    document.getElementById('municipioSelect').value = '';
+    atualizarMunicipiosPorRegiao();
+    aplicarFiltros();
+  });
+
+  document.getElementById('municipioSelect').addEventListener('change', function() {
+    aplicarFiltros();
+  });
+
+  document.getElementById('toggleOAE').addEventListener('change', function() {
+    aplicarFiltros();
+  });
+
+  document.getElementById('aplicarFiltros').addEventListener('click', function() {
+    aplicarFiltros();
+  });
+
+  document.getElementById('limparFiltro').addEventListener('click', function() {
+    limparTudo();
+  });
+
+  var botoesPrograma = document.querySelectorAll('.programa-btn');
+  var iBot;
+  for (iBot = 0; iBot < botoesPrograma.length; iBot++) {
+    botoesPrograma[iBot].addEventListener('click', function() {
+      var prog = this.getAttribute('data-programa');
+
+      if (programaAtivo === prog) {
+        programaAtivo = '';
+      } else {
+        programaAtivo = prog;
+      }
+
+      resetarBotoesPrograma();
+
+      if (programaAtivo) {
+        var botao = document.querySelector('.programa-btn[data-programa="' + programaAtivo + '"]');
+        if (botao) botao.classList.add('ativo-filtro');
+      }
+
+      aplicarFiltros();
+    });
+  }
+
+  var checksServico = document.querySelectorAll('.servico-linear');
+  var iCheck;
+  for (iCheck = 0; iCheck < checksServico.length; iCheck++) {
+    checksServico[iCheck].addEventListener('change', function() {
+      aplicarFiltros();
+    });
+  }
+
+  Promise.all([
+    fetch('municipios.geojson').then(function(r) { return r.json(); }),
+    fetch('sre_linhas.geojson').then(function(r) { return r.json(); }),
+    fetch('oae_pontos.geojson').then(function(r) { return r.json(); })
+  ]).then(function(resultado) {
+    municipiosData = resultado[0];
+    sreData = resultado[1];
+    oaeData = resultado[2];
+
+    preencherRGPlan();
+    preencherMunicipios();
+    desenharMunicipiosBase();
+    aplicarFiltros();
+  }).catch(function(e) {
+    console.error(e);
+    alert('Erro ao carregar arquivos. Confira os nomes: municipios.geojson, sre_linhas.geojson e oae_pontos.geojson');
+  });
+</script>
+
+</body>
+</html>
