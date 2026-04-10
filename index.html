@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
@@ -8,9 +7,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     html, body {
       margin: 0;
@@ -22,7 +19,7 @@
 
     #app {
       display: grid;
-      grid-template-columns: 360px 1fr 320px;
+      grid-template-columns: 360px 1fr 360px;
       height: 100vh;
       width: 100vw;
     }
@@ -35,13 +32,8 @@
       padding: 16px;
     }
 
-    #sidebar-left {
-      border-right: 1px solid #d1d5db;
-    }
-
-    #sidebar-right {
-      border-left: 1px solid #d1d5db;
-    }
+    #sidebar-left { border-right: 1px solid #d1d5db; }
+    #sidebar-right { border-left: 1px solid #d1d5db; }
 
     #map-wrap {
       min-width: 0;
@@ -104,53 +96,43 @@
       font-weight: 700;
     }
 
-    .programas {
+    .grid-botoes {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
       margin-bottom: 10px;
     }
 
-    .programa-btn {
+    .grid-botoes.programas {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .filtro-btn {
       border: 1px solid #9ca3af;
       background: #f3f4f6;
-      padding: 10px 4px;
+      padding: 10px 6px;
       cursor: pointer;
       border-radius: 8px;
       font-size: 12px;
       font-weight: 700;
       color: #111827;
+      text-align: center;
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .programa-btn.ativo-filtro {
+    .filtro-btn.ativo-filtro {
       background: #1f2937;
       color: #ffffff;
       border-color: #1f2937;
     }
 
-    .programa-btn.ativo-municipio {
+    .filtro-btn.ativo-municipio {
       background: #d4af37;
       color: #000000;
       border-color: #a07f14;
-    }
-
-    .servicos-lineares {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 6px;
-      margin-top: 4px;
-    }
-
-    .servico-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 13px;
-      color: #111827;
-    }
-
-    .servico-item input {
-      margin: 0;
     }
 
     .contador {
@@ -161,18 +143,43 @@
 
     .legenda-item {
       display: flex;
-      align-items: center;
-      margin-bottom: 8px;
+      align-items: flex-start;
+      margin-bottom: 10px;
       font-size: 13px;
       color: #111827;
+      line-height: 1.35;
+    }
+
+    .legenda-linha-wrap {
+      width: 42px;
+      margin-right: 8px;
+      flex-shrink: 0;
+      position: relative;
+      height: 14px;
+      display: flex;
+      align-items: center;
     }
 
     .legenda-linha {
-      width: 24px;
-      height: 5px;
-      display: inline-block;
-      margin-right: 8px;
-      flex-shrink: 0;
+      width: 100%;
+      display: block;
+    }
+
+    .legenda-linha-projeto-base {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+    }
+
+    .legenda-linha-projeto-topo {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 100%;
+      background: #ffffff;
     }
 
     .legenda-simbolo {
@@ -183,18 +190,16 @@
       border: 1px solid #000;
       transform: rotate(45deg);
       flex-shrink: 0;
+      margin-top: 2px;
     }
 
-    .obs {
-      font-size: 12px;
-      color: #6b7280;
-      line-height: 1.5;
-      margin-top: 6px;
+    .legenda-texto {
+      flex: 1;
     }
 
     @media (max-width: 1200px) {
       #app {
-        grid-template-columns: 320px 1fr 280px;
+        grid-template-columns: 320px 1fr 320px;
       }
     }
 
@@ -207,7 +212,7 @@
       #sidebar-left,
       #sidebar-right {
         height: auto;
-        max-height: 32vh;
+        max-height: 34vh;
       }
 
       #sidebar-left {
@@ -221,68 +226,64 @@
       }
 
       #map-wrap {
-        height: 36vh;
+        height: 32vh;
       }
     }
   </style>
-
 </head>
 <body>
 <div id="app">
   <aside id="sidebar-left">
     <div class="titulo">PLANO GOINFRA 2026 - 2030</div>
 
-```
-<div class="bloco">
-  <div class="subtitulo">Filtros</div>
+    <div class="bloco">
+      <div class="subtitulo">Filtros</div>
 
-  <label for="rgPlanSelect">Região de Planejamento</label>
-  <select id="rgPlanSelect">
-    <option value="">Todas</option>
-  </select>
+      <label for="rgPlanSelect">Região de Planejamento</label>
+      <select id="rgPlanSelect">
+        <option value="">Todas</option>
+      </select>
 
-  <label for="municipioSelect">Município</label>
-  <select id="municipioSelect">
-    <option value="">Todos</option>
-  </select>
+      <label for="municipioSelect">Município</label>
+      <select id="municipioSelect">
+        <option value="">Todos</option>
+      </select>
 
-  <div class="subtitulo">Programas municipais</div>
-  <div class="programas">
-    <button class="programa-btn" data-programa="GME" type="button">GME</button>
-    <button class="programa-btn" data-programa="GMK" type="button">GMK</button>
-    <button class="programa-btn" data-programa="GMM" type="button">GMM</button>
-    <button class="programa-btn" data-programa="GMP" type="button">GMP</button>
-    <button class="programa-btn" data-programa="GPP" type="button">GPP</button>
-    <button class="programa-btn" data-programa="PMR" type="button">PMR</button>
-  </div>
+      <div class="subtitulo">Programas municipais</div>
+      <div class="grid-botoes programas">
+        <button class="filtro-btn programa-btn" data-programa="GME" type="button">GME</button>
+        <button class="filtro-btn programa-btn" data-programa="GMK" type="button">GMK</button>
+        <button class="filtro-btn programa-btn" data-programa="GMM" type="button">GMM</button>
+        <button class="filtro-btn programa-btn" data-programa="GMP" type="button">GMP</button>
+        <button class="filtro-btn programa-btn" data-programa="GPP" type="button">GPP</button>
+        <button class="filtro-btn programa-btn" data-programa="PMR" type="button">PMR</button>
+      </div>
 
-  <div class="subtitulo">Serviços lineares</div>
-  <div class="servicos-lineares">
-    <label class="servico-item"><input type="checkbox" class="servico-linear" value="DPJ" checked> Projetos</label>
-    <label class="servico-item"><input type="checkbox" class="servico-linear" value="TES_LIC" checked> Tesouro Licitação</label>
-    <label class="servico-item"><input type="checkbox" class="servico-linear" value="TES_AND" checked> Tesouro em Andamento</label>
-    <label class="servico-item"><input type="checkbox" class="servico-linear" value="FUN_AND" checked> FUNDEINFRA em Andamento</label>
-    <label class="servico-item"><input type="checkbox" class="servico-linear" value="FUN_LIC" checked> FUNDEINFRA em Licitação</label>
-    <label class="servico-item"><input type="checkbox" class="servico-linear" value="FEDER" checked> Federalização</label>
-    <label class="servico-item"><input type="checkbox" class="servico-linear" value="MICRO" checked> Microrrevestimento</label>
-  </div>
+      <div class="subtitulo">Serviços lineares</div>
+      <div class="grid-botoes" id="servicosLinearesBotoes">
+        <button class="filtro-btn servico-btn ativo-filtro" data-servico="DPJ" type="button">Projetos</button>
+        <button class="filtro-btn servico-btn ativo-filtro" data-servico="TES_LIC" type="button">Tesouro Licitação</button>
+        <button class="filtro-btn servico-btn ativo-filtro" data-servico="TES_AND" type="button">Tesouro em Andamento</button>
+        <button class="filtro-btn servico-btn ativo-filtro" data-servico="FUN_AND" type="button">FUNDEINFRA em Andamento</button>
+        <button class="filtro-btn servico-btn ativo-filtro" data-servico="FUN_LIC" type="button">FUNDEINFRA em Licitação</button>
+        <button class="filtro-btn servico-btn ativo-filtro" data-servico="FEDER" type="button">Federalização</button>
+        <button class="filtro-btn servico-btn ativo-filtro" data-servico="MICRO" type="button">Microrrevestimento</button>
+      </div>
 
-  <div class="subtitulo">Obras de Arte Especiais</div>
-  <div class="servicos-lineares">
-    <label class="servico-item"><input type="checkbox" id="toggleOAE" checked> Exibir OAE</label>
-  </div>
+      <div class="subtitulo">Obras de Arte Especiais</div>
+      <div class="grid-botoes">
+        <button class="filtro-btn oae-btn ativo-filtro" id="toggleOAE" type="button">Exibir OAE</button>
+      </div>
 
-  <button id="aplicarFiltros" type="button">Aplicar filtros</button>
-  <button id="limparFiltro" type="button">Limpar</button>
+      <button id="aplicarFiltros" type="button">Aplicar filtros</button>
+      <button id="limparFiltro" type="button">Limpar</button>
 
-  <div class="contador">
-    Municípios: <span id="countMunicipios">0</span><br>
-    Linhas: <span id="countLinhas">0</span><br>
-    OAE: <span id="countOAE">0</span>
-  </div>
-</div>
-```
-
+      <div class="contador">
+        Municípios: <span id="countMunicipios">0</span><br>
+        Linhas: <span id="countLinhas">0</span><br>
+        OAE: <span id="countOAE">0</span>
+      </div>
+    </div>
   </aside>
 
   <main id="map-wrap">
@@ -292,29 +293,52 @@
   <aside id="sidebar-right">
     <div class="bloco">
       <div class="subtitulo">Legenda — Serviços lineares</div>
-      <div class="legenda-item"><span class="legenda-linha" style="background:#ff0000;"></span>Pavimentação</div>
-      <div class="legenda-item"><span class="legenda-linha" style="background:#0000ff;"></span>Duplicação</div>
-      <div class="legenda-item"><span class="legenda-linha" style="background:#00d61f;"></span>Restauração</div>
-      <div class="legenda-item"><span class="legenda-linha" style="background:#f39c12;"></span>Melhoria Funcional</div>
-      <div class="legenda-item"><span class="legenda-linha" style="background:#d9ef22;"></span>Federalização</div>
-      <div class="legenda-item"><span class="legenda-linha" style="background:#e44de8;"></span>Microrrevestimento</div>
-      <div class="obs">Os filtros por Projetos, Tesouro, FUNDEINFRA, Federalização e Microrrevestimento continuam independentes. A cor da linha representa o tipo/camada visível no momento.</div>
+      <div id="legendaServicos"></div>
     </div>
 
-```
-<div class="bloco">
-  <div class="subtitulo">Legenda — Obras de Arte Especiais</div>
-  <div class="legenda-item"><span class="legenda-simbolo" style="background:#00ffff;"></span>Eixo 1</div>
-  <div class="legenda-item"><span class="legenda-simbolo" style="background:#ffff00;"></span>Eixo 2</div>
-  <div class="legenda-item"><span class="legenda-simbolo" style="background:#ff0000;"></span>Eixo 3</div>
-  <div class="legenda-item"><span class="legenda-simbolo" style="background:#2f80ed;"></span>Eixo 4</div>
-  <div class="legenda-item"><span class="legenda-simbolo" style="background:#00ff00;"></span>Eixo 5</div>
-  <div class="legenda-item"><span class="legenda-simbolo" style="background:#ff4dc4;"></span>Eixo 6</div>
-  <div class="legenda-item"><span class="legenda-simbolo" style="background:#8B5A00;"></span>Bueiro</div>
-  <div class="legenda-item"><span class="legenda-simbolo" style="background:#999999;"></span>Viaduto</div>
-</div>
-```
+    <div class="bloco">
+      <div class="subtitulo">Legenda — Obras de Arte Especiais</div>
 
+      <div class="legenda-item">
+        <span class="legenda-simbolo" style="background:#00ffff;"></span>
+        <div class="legenda-texto"><b>Eixo 1</b> — Manutenção e restauração de pontes em rodovias pavimentadas</div>
+      </div>
+
+      <div class="legenda-item">
+        <span class="legenda-simbolo" style="background:#ffff00;"></span>
+        <div class="legenda-texto"><b>Eixo 2</b> — GPP - Programa Goiás de Ponta a Ponte</div>
+      </div>
+
+      <div class="legenda-item">
+        <span class="legenda-simbolo" style="background:#ff0000;"></span>
+        <div class="legenda-texto"><b>Eixo 3</b> — Obras firmadas em parcerias com entes externos</div>
+      </div>
+
+      <div class="legenda-item">
+        <span class="legenda-simbolo" style="background:#2f80ed;"></span>
+        <div class="legenda-texto"><b>Eixo 4</b> — Novas Obras Estaduais</div>
+      </div>
+
+      <div class="legenda-item">
+        <span class="legenda-simbolo" style="background:#00ff00;"></span>
+        <div class="legenda-texto"><b>Eixo 5</b> — GME - Programa Goiás em Movimento Estruturas</div>
+      </div>
+
+      <div class="legenda-item">
+        <span class="legenda-simbolo" style="background:#ff4dc4;"></span>
+        <div class="legenda-texto"><b>Eixo 6</b> — GMK - Programa Goiás em Movimento Kalunga</div>
+      </div>
+
+      <div class="legenda-item">
+        <span class="legenda-simbolo" style="background:#8B5A00;"></span>
+        <div class="legenda-texto"><b>Bueiro</b></div>
+      </div>
+
+      <div class="legenda-item">
+        <span class="legenda-simbolo" style="background:#999999;"></span>
+        <div class="legenda-texto"><b>Viaduto</b></div>
+      </div>
+    </div>
   </aside>
 </div>
 
@@ -327,25 +351,223 @@
     attribution: '© OpenStreetMap'
   }).addTo(map);
 
+  const REGRAS_ESTILO = [
+    {
+      legenda: "Pavimentação - Em Andamento",
+      cor: "#dc0101",
+      tipo_linha: "NORMAL",
+      espessura: 5,
+      prioridade: 1,
+      regra: {
+        op: "OR",
+        condicoes: [
+          { grupo: "TES_AND", campo: "TES.AND.SV", comparador: "=", valor: "Pavimentação" },
+          { grupo: "FUN_AND", campo: "FUN.AND.SV", comparador: "=", valor: "Pavimentação" }
+        ]
+      }
+    },
+    {
+      legenda: "Duplicação - Em Andamento",
+      cor: "#001efe",
+      tipo_linha: "NORMAL",
+      espessura: 5,
+      prioridade: 2,
+      regra: {
+        op: "OR",
+        condicoes: [
+          { grupo: "TES_AND", campo: "TES.AND.SV", comparador: "=", valor: "Duplicação" },
+          { grupo: "FUN_AND", campo: "FUN.AND.SV", comparador: "=", valor: "Duplicação" }
+        ]
+      }
+    },
+    {
+      legenda: "Restauração - Em Andamento",
+      cor: "#10a000",
+      tipo_linha: "NORMAL",
+      espessura: 5,
+      prioridade: 3,
+      regra: {
+        op: "OR",
+        condicoes: [
+          { grupo: "TES_AND", campo: "TES.AND.SV", comparador: "=", valor: "Restauração" },
+          { grupo: "FUN_AND", campo: "FUN.AND.SV", comparador: "=", valor: "Restauração" }
+        ]
+      }
+    },
+    {
+      legenda: "Melhoria Funcional - Em Andamento",
+      cor: "#ff9601",
+      tipo_linha: "NORMAL",
+      espessura: 5,
+      prioridade: 4,
+      regra: {
+        op: "OR",
+        condicoes: [
+          { grupo: "TES_AND", campo: "TES.AND.SV", comparador: "=", valor: "Melhoria Funcional" },
+          { grupo: "FUN_AND", campo: "FUN.AND.SV", comparador: "=", valor: "Melhoria Funcional" }
+        ]
+      }
+    },
+    {
+      legenda: "Pavimentação - Em Licitação",
+      cor: "#dc8484",
+      tipo_linha: "NORMAL",
+      espessura: 5,
+      prioridade: 5,
+      regra: {
+        op: "OR",
+        condicoes: [
+          { grupo: "TES_LIC", campo: "TES.LIC.SV", comparador: "=", valor: "Pavimentação" },
+          { grupo: "FUN_LIC", campo: "FUN.LIC.SV", comparador: "=", valor: "Pavimentação" }
+        ]
+      }
+    },
+    {
+      legenda: "Duplicação - Em Licitação",
+      cor: "#7f90fe",
+      tipo_linha: "NORMAL",
+      espessura: 5,
+      prioridade: 6,
+      regra: {
+        op: "OR",
+        condicoes: [
+          { grupo: "TES_LIC", campo: "TES.LIC.SV", comparador: "=", valor: "Duplicação" },
+          { grupo: "FUN_LIC", campo: "FUN.LIC.SV", comparador: "=", valor: "Duplicação" }
+        ]
+      }
+    },
+    {
+      legenda: "Restauração - Em Licitação",
+      cor: "#8fd388",
+      tipo_linha: "NORMAL",
+      espessura: 5,
+      prioridade: 7,
+      regra: {
+        op: "OR",
+        condicoes: [
+          { grupo: "TES_LIC", campo: "TES.LIC.SV", comparador: "=", valor: "Restauração" },
+          { grupo: "FUN_LIC", campo: "FUN.LIC.SV", comparador: "=", valor: "Restauração" }
+        ]
+      }
+    },
+    {
+      legenda: "Melhoria Funcional - Em Licitação",
+      cor: "#ffd388",
+      tipo_linha: "NORMAL",
+      espessura: 5,
+      prioridade: 8,
+      regra: {
+        op: "OR",
+        condicoes: [
+          { grupo: "TES_LIC", campo: "TES.LIC.SV", comparador: "=", valor: "Melhoria Funcional" },
+          { grupo: "FUN_LIC", campo: "FUN.LIC.SV", comparador: "=", valor: "Melhoria Funcional" }
+        ]
+      }
+    },
+    {
+      legenda: "Pavimentação - Projeto",
+      cor: "#dc0101",
+      tipo_linha: "COM LINHA BRANCA",
+      espessura: 5,
+      prioridade: 9,
+      regra: {
+        op: "AND",
+        condicoes: [
+          { grupo: "DPJ", campo: "DPJ.SV", comparador: "=", valor: "Pavimentação" }
+        ]
+      }
+    },
+    {
+      legenda: "Duplicação - Projeto",
+      cor: "#001efe",
+      tipo_linha: "COM LINHA BRANCA",
+      espessura: 5,
+      prioridade: 10,
+      regra: {
+        op: "AND",
+        condicoes: [
+          { grupo: "DPJ", campo: "DPJ.SV", comparador: "=", valor: "Duplicação" }
+        ]
+      }
+    },
+    {
+      legenda: "Restauração - Projeto",
+      cor: "#10a000",
+      tipo_linha: "COM LINHA BRANCA",
+      espessura: 5,
+      prioridade: 11,
+      regra: {
+        op: "AND",
+        condicoes: [
+          { grupo: "DPJ", campo: "DPJ.SV", comparador: "=", valor: "Restauração" }
+        ]
+      }
+    },
+    {
+      legenda: "Melhoria Funcional - Projeto",
+      cor: "#ff9601",
+      tipo_linha: "COM LINHA BRANCA",
+      espessura: 5,
+      prioridade: 12,
+      regra: {
+        op: "AND",
+        condicoes: [
+          { grupo: "DPJ", campo: "DPJ.SV", comparador: "=", valor: "Melhoria Funcional" }
+        ]
+      }
+    },
+    {
+      legenda: "Federalização",
+      cor: "#e0fe00",
+      tipo_linha: "NORMAL",
+      espessura: 5,
+      prioridade: 13,
+      regra: {
+        op: "AND",
+        condicoes: [
+          { grupo: "FEDER", campo: "FEDER", comparador: "=", valor: 1 }
+        ]
+      }
+    },
+    {
+      legenda: "Microrrevestimento",
+      cor: "#fe49e6",
+      tipo_linha: "NORMAL",
+      espessura: 5,
+      prioridade: 14,
+      regra: {
+        op: "AND",
+        condicoes: [
+          { grupo: "MICRO", campo: "PMR", comparador: ">", valor: 0 }
+        ]
+      }
+    }
+  ];
+
   var municipiosData = null;
   var sreData = null;
   var oaeData = null;
+  var estadosData = null;
 
+  var estadosLayer = null;
   var municipiosLayer = null;
-  var destaqueLayer = null;
   var oaeLayer = null;
-
-  var sreLayers = {
-    pavimentacao: null,
-    duplicacao: null,
-    restauracao: null,
-    melhoria: null,
-    federalizacao: null,
-    microrrevestimento: null
-  };
+  var regraLayers = [];
 
   var programaAtivo = '';
   var programas = ['GME', 'GMK', 'GMM', 'GMP', 'GPP', 'PMR'];
+
+  var servicosAtivos = {
+    DPJ: true,
+    TES_LIC: true,
+    TES_AND: true,
+    FUN_AND: true,
+    FUN_LIC: true,
+    FEDER: true,
+    MICRO: true
+  };
+
+  var oaeFiltroAtivo = true;
 
   function valorSeguro(obj, campo) {
     if (!obj || !obj.properties) return '';
@@ -353,27 +575,13 @@
     return obj.properties[campo];
   }
 
-  function textoTemValor(v) {
-    if (v === null || v === undefined) return false;
-    return String(v).trim() !== '';
-  }
-
-  function numeroPrograma(feature, campo) {
-    var v = valorSeguro(feature, campo);
-    if (v === '') return 0;
+  function numeroSeguro(v) {
+    if (v === null || v === undefined || String(v).trim() === '') return 0;
     return Number(v);
   }
 
-  function valorEhUm(v) {
-    if (v === null || v === undefined) return false;
-    return String(v).trim() === '1' || Number(v) === 1;
-  }
-
-  function valorPMRAtivo(v) {
-    if (v === null || v === undefined) return false;
-    var t = String(v).trim();
-    if (t === '' || t === '0') return false;
-    return true;
+  function numeroPrograma(feature, campo) {
+    return numeroSeguro(valorSeguro(feature, campo));
   }
 
   function corOAE(eixo) {
@@ -424,24 +632,20 @@
   function preencherRGPlan() {
     var select = document.getElementById('rgPlanSelect');
     var valores = [];
-    var i, rg, f;
 
-    for (i = 0; i < municipiosData.features.length; i++) {
-      f = municipiosData.features[i];
-      rg = valorSeguro(f, 'RG_PLAN');
-      if (rg && valores.indexOf(rg) === -1) {
-        valores.push(rg);
-      }
+    for (var i = 0; i < municipiosData.features.length; i++) {
+      var rg = valorSeguro(municipiosData.features[i], 'RG_PLAN');
+      if (rg && valores.indexOf(rg) === -1) valores.push(rg);
     }
 
     valores.sort(function(a, b) {
       return String(a).localeCompare(String(b), 'pt-BR');
     });
 
-    for (i = 0; i < valores.length; i++) {
+    for (var j = 0; j < valores.length; j++) {
       var opt = document.createElement('option');
-      opt.value = valores[i];
-      opt.textContent = valores[i];
+      opt.value = valores[j];
+      opt.textContent = valores[j];
       select.appendChild(opt);
     }
   }
@@ -449,26 +653,21 @@
   function preencherMunicipios() {
     var select = document.getElementById('municipioSelect');
     var nomes = [];
-    var i, nome, f;
-
     select.innerHTML = '<option value="">Todos</option>';
 
-    for (i = 0; i < municipiosData.features.length; i++) {
-      f = municipiosData.features[i];
-      nome = valorSeguro(f, 'NM_MUN');
-      if (nome && nomes.indexOf(nome) === -1) {
-        nomes.push(nome);
-      }
+    for (var i = 0; i < municipiosData.features.length; i++) {
+      var nome = valorSeguro(municipiosData.features[i], 'NM_MUN');
+      if (nome && nomes.indexOf(nome) === -1) nomes.push(nome);
     }
 
     nomes.sort(function(a, b) {
       return String(a).localeCompare(String(b), 'pt-BR');
     });
 
-    for (i = 0; i < nomes.length; i++) {
+    for (var j = 0; j < nomes.length; j++) {
       var opt = document.createElement('option');
-      opt.value = nomes[i];
-      opt.textContent = nomes[i];
+      opt.value = nomes[j];
+      opt.textContent = nomes[j];
       select.appendChild(opt);
     }
   }
@@ -477,14 +676,12 @@
     var rgSelecionada = document.getElementById('rgPlanSelect').value;
     var select = document.getElementById('municipioSelect');
     var nomes = [];
-    var i, nome, rg, f;
-
     select.innerHTML = '<option value="">Todos</option>';
 
-    for (i = 0; i < municipiosData.features.length; i++) {
-      f = municipiosData.features[i];
-      nome = valorSeguro(f, 'NM_MUN');
-      rg = valorSeguro(f, 'RG_PLAN');
+    for (var i = 0; i < municipiosData.features.length; i++) {
+      var f = municipiosData.features[i];
+      var nome = valorSeguro(f, 'NM_MUN');
+      var rg = valorSeguro(f, 'RG_PLAN');
 
       if (nome && (!rgSelecionada || rg === rgSelecionada) && nomes.indexOf(nome) === -1) {
         nomes.push(nome);
@@ -495,21 +692,34 @@
       return String(a).localeCompare(String(b), 'pt-BR');
     });
 
-    for (i = 0; i < nomes.length; i++) {
+    for (var j = 0; j < nomes.length; j++) {
       var opt = document.createElement('option');
-      opt.value = nomes[i];
-      opt.textContent = nomes[i];
+      opt.value = nomes[j];
+      opt.textContent = nomes[j];
       select.appendChild(opt);
     }
   }
 
   function resetarBotoesPrograma() {
     var botoes = document.querySelectorAll('.programa-btn');
-    var i;
-    for (i = 0; i < botoes.length; i++) {
+    for (var i = 0; i < botoes.length; i++) {
       botoes[i].classList.remove('ativo-filtro');
       botoes[i].classList.remove('ativo-municipio');
     }
+  }
+
+  function resetarBotoesServico() {
+    var botoes = document.querySelectorAll('.servico-btn');
+    for (var i = 0; i < botoes.length; i++) {
+      botoes[i].classList.remove('ativo-filtro');
+      botoes[i].classList.remove('ativo-municipio');
+    }
+  }
+
+  function resetarBotaoOAE() {
+    var botao = document.getElementById('toggleOAE');
+    botao.classList.remove('ativo-filtro');
+    botao.classList.remove('ativo-municipio');
   }
 
   function atualizarIndicadoresProgramaMunicipio(nomeMunicipio) {
@@ -523,22 +733,18 @@
       return;
     }
 
-    var i, f, nome;
     var municipioFeature = null;
-
-    for (i = 0; i < municipiosData.features.length; i++) {
-      f = municipiosData.features[i];
-      nome = valorSeguro(f, 'NM_MUN');
-      if (nome === nomeMunicipio) {
-        municipioFeature = f;
+    for (var i = 0; i < municipiosData.features.length; i++) {
+      if (valorSeguro(municipiosData.features[i], 'NM_MUN') === nomeMunicipio) {
+        municipioFeature = municipiosData.features[i];
         break;
       }
     }
 
     if (!municipioFeature) return;
 
-    for (i = 0; i < programas.length; i++) {
-      var prog = programas[i];
+    for (var j = 0; j < programas.length; j++) {
+      var prog = programas[j];
       var botao = document.querySelector('.programa-btn[data-programa="' + prog + '"]');
       if (botao && numeroPrograma(municipioFeature, prog) > 0) {
         botao.classList.add('ativo-municipio');
@@ -546,32 +752,74 @@
     }
   }
 
-  function servicosLinearesSelecionados() {
-    var checks = document.querySelectorAll('.servico-linear');
-    var ativos = {};
-    var i;
+  function atualizarIndicadoresServicoEOAE(nomeMunicipio) {
+    resetarBotoesServico();
+    resetarBotaoOAE();
 
-    for (i = 0; i < checks.length; i++) {
-      ativos[checks[i].value] = checks[i].checked;
+    var servicosDisponiveis = {
+      DPJ: false,
+      TES_LIC: false,
+      TES_AND: false,
+      FUN_AND: false,
+      FUN_LIC: false,
+      FEDER: false,
+      MICRO: false
+    };
+
+    var oaeDisponivel = false;
+
+    if (nomeMunicipio) {
+      for (var i = 0; i < sreData.features.length; i++) {
+        var f = sreData.features[i];
+        if (valorSeguro(f, 'NM_MUN') !== nomeMunicipio) continue;
+
+        if (valorSeguro(f, 'DPJ.SV')) servicosDisponiveis.DPJ = true;
+        if (valorSeguro(f, 'TES.LIC.SV')) servicosDisponiveis.TES_LIC = true;
+        if (valorSeguro(f, 'TES.AND.SV')) servicosDisponiveis.TES_AND = true;
+        if (valorSeguro(f, 'FUN.AND.SV')) servicosDisponiveis.FUN_AND = true;
+        if (valorSeguro(f, 'FUN.LIC.SV')) servicosDisponiveis.FUN_LIC = true;
+        if (numeroSeguro(valorSeguro(f, 'FEDER')) === 1) servicosDisponiveis.FEDER = true;
+        if (numeroSeguro(valorSeguro(f, 'PMR')) > 0) servicosDisponiveis.MICRO = true;
+      }
+
+      for (var j = 0; j < oaeData.features.length; j++) {
+        if (valorSeguro(oaeData.features[j], 'NM_MUN') === nomeMunicipio) {
+          oaeDisponivel = true;
+          break;
+        }
+      }
     }
 
-    return ativos;
-  }
+    var botoesServico = document.querySelectorAll('.servico-btn');
+    for (var k = 0; k < botoesServico.length; k++) {
+      var chave = botoesServico[k].getAttribute('data-servico');
 
-  function oaeAtiva() {
-    return document.getElementById('toggleOAE').checked;
+      if (servicosAtivos[chave]) {
+        botoesServico[k].classList.add('ativo-filtro');
+      }
+      if (nomeMunicipio && servicosDisponiveis[chave]) {
+        botoesServico[k].classList.add('ativo-municipio');
+      }
+    }
+
+    var botaoOAE = document.getElementById('toggleOAE');
+    if (oaeFiltroAtivo) {
+      botaoOAE.classList.add('ativo-filtro');
+    }
+    if (nomeMunicipio && oaeDisponivel) {
+      botaoOAE.classList.add('ativo-municipio');
+    }
   }
 
   function municipiosFiltrados() {
     var rg = document.getElementById('rgPlanSelect').value;
     var municipio = document.getElementById('municipioSelect').value;
-    var i, f, nome, rgPlan;
     var lista = [];
 
-    for (i = 0; i < municipiosData.features.length; i++) {
-      f = municipiosData.features[i];
-      nome = valorSeguro(f, 'NM_MUN');
-      rgPlan = valorSeguro(f, 'RG_PLAN');
+    for (var i = 0; i < municipiosData.features.length; i++) {
+      var f = municipiosData.features[i];
+      var nome = valorSeguro(f, 'NM_MUN');
+      var rgPlan = valorSeguro(f, 'RG_PLAN');
 
       if (rg && rgPlan !== rg) continue;
       if (municipio && nome !== municipio) continue;
@@ -583,119 +831,156 @@
     return lista;
   }
 
-  function desenharMunicipiosBase() {
-    if (municipiosLayer) map.removeLayer(municipiosLayer);
+  function ehGoias(feature) {
+    var props = feature.properties || {};
+    var candidatos = [
+      props.SIGLA_UF, props.UF, props.SIGLA, props.sg_uf,
+      props.NM_UF, props.nome, props.NOME, props.estado
+    ];
 
-    municipiosLayer = L.geoJSON(municipiosData, {
-      style: function() {
-        return {
-          color: '#666666',
-          weight: 1,
-          fillColor: '#ffffff',
-          fillOpacity: 0.05
-        };
-      },
-      onEachFeature: function(feature, layer) {
-        var nome = valorSeguro(feature, 'NM_MUN');
-        var rg = valorSeguro(feature, 'RG_PLAN');
-        layer.bindPopup('<b>Município:</b> ' + nome + '<br><b>RG_PLAN:</b> ' + rg);
-      }
-    }).addTo(map);
-  }
-
-  function desenharDestaqueMunicipios(features) {
-    if (destaqueLayer) {
-      map.removeLayer(destaqueLayer);
-      destaqueLayer = null;
+    for (var i = 0; i < candidatos.length; i++) {
+      var v = String(candidatos[i] || '').trim().toUpperCase();
+      if (v === 'GO' || v === 'GOIÁS' || v === 'GOIAS') return true;
     }
-
-    destaqueLayer = L.geoJSON({
-      type: 'FeatureCollection',
-      features: features
-    }, {
-      style: function() {
-        return {
-          color: '#000000',
-          weight: 2,
-          fillColor: '#ffff00',
-          fillOpacity: 0.18
-        };
-      }
-    }).addTo(map);
-  }
-
-  function limparCamadasSRE() {
-    for (var chave in sreLayers) {
-      if (sreLayers[chave]) {
-        map.removeLayer(sreLayers[chave]);
-        sreLayers[chave] = null;
-      }
-    }
-  }
-
-  function linhaTemCategoria(feature, categoria, ativos) {
-    var dpj = valorSeguro(feature, 'DPJ.SV');
-    var tesLic = valorSeguro(feature, 'TES.LIC.SV');
-    var tesAnd = valorSeguro(feature, 'TES.AND.SV');
-    var funAnd = valorSeguro(feature, 'FUN.AND.SV');
-    var funLic = valorSeguro(feature, 'FUN.LIC.SV');
-    var feder = valorSeguro(feature, 'FEDER');
-    var pmr = valorSeguro(feature, 'PMR');
-
-    function baseAtivaPorTipo(tipo) {
-      if (ativos.DPJ && dpj === tipo) return true;
-      if (ativos.TES_LIC && tesLic === tipo) return true;
-      if (ativos.TES_AND && tesAnd === tipo) return true;
-      if (ativos.FUN_AND && funAnd === tipo) return true;
-      if (ativos.FUN_LIC && funLic === tipo) return true;
-      return false;
-    }
-
-    if (categoria === 'pavimentacao') return baseAtivaPorTipo('Pavimentação');
-    if (categoria === 'duplicacao') return baseAtivaPorTipo('Duplicação');
-    if (categoria === 'restauracao') return baseAtivaPorTipo('Restauração');
-    if (categoria === 'melhoria') return baseAtivaPorTipo('Melhoria Funcional');
-    if (categoria === 'federalizacao') return ativos.FEDER && valorEhUm(feder);
-    if (categoria === 'microrrevestimento') return ativos.MICRO && valorPMRAtivo(pmr);
-
     return false;
   }
 
-  function descricaoServicosLinha(feature) {
-    var partes = [];
+  function desenharEstados() {
+    if (!estadosData) return;
+    if (estadosLayer) map.removeLayer(estadosLayer);
 
-    var dpj = valorSeguro(feature, 'DPJ.SV');
-    var tesLic = valorSeguro(feature, 'TES.LIC.SV');
-    var tesAnd = valorSeguro(feature, 'TES.AND.SV');
-    var funAnd = valorSeguro(feature, 'FUN.AND.SV');
-    var funLic = valorSeguro(feature, 'FUN.LIC.SV');
-    var feder = valorSeguro(feature, 'FEDER');
-    var pmr = valorSeguro(feature, 'PMR');
+    estadosLayer = L.geoJSON(estadosData, {
+      style: function(feature) {
+        if (ehGoias(feature)) {
+          return {
+            color: '#666666',
+            weight: 1,
+            fillColor: '#ffffff',
+            fillOpacity: 0
+          };
+        }
+        return {
+          color: '#666666',
+          weight: 1,
+          fillColor: '#808080',
+          fillOpacity: 0.28
+        };
+      }
+    }).addTo(map);
+  }
 
-    if (textoTemValor(dpj)) partes.push('Projetos: ' + dpj);
-    if (textoTemValor(tesLic)) partes.push('Tesouro Licitação: ' + tesLic);
-    if (textoTemValor(tesAnd)) partes.push('Tesouro em Andamento: ' + tesAnd);
-    if (textoTemValor(funAnd)) partes.push('FUNDEINFRA em Andamento: ' + funAnd);
-    if (textoTemValor(funLic)) partes.push('FUNDEINFRA em Licitação: ' + funLic);
-    if (valorEhUm(feder)) partes.push('Federalização');
-    if (valorPMRAtivo(pmr)) partes.push('Microrrevestimento');
+  function desenharMunicipiosBase(featuresSelecionados) {
+    if (municipiosLayer) map.removeLayer(municipiosLayer);
 
-    if (partes.length === 0) return 'Sem serviço classificado';
-    return partes.join('<br>');
+    var selecionados = new Set(
+      (featuresSelecionados || []).map(function(f) {
+        return valorSeguro(f, 'NM_MUN');
+      })
+    );
+
+    var haSelecao = selecionados.size > 0 &&
+                    selecionados.size < municipiosData.features.length;
+
+    municipiosLayer = L.geoJSON(municipiosData, {
+      style: function(feature) {
+        var nome = valorSeguro(feature, 'NM_MUN');
+        var selecionado = selecionados.has(nome);
+
+        if (!haSelecao) {
+          return {
+            color: '#666666',
+            weight: 1,
+            fillColor: '#ffffff',
+            fillOpacity: 0
+          };
+        }
+
+        if (selecionado) {
+          return {
+            color: '#000000',
+            weight: 2.2,
+            fillColor: '#ffffff',
+            fillOpacity: 0
+          };
+        }
+
+        return {
+          color: '#666666',
+          weight: 1,
+          fillColor: '#808080',
+          fillOpacity: 0.28
+        };
+      },
+      onEachFeature: function(feature, layer) {
+        layer.bindPopup(
+          '<b>Município:</b> ' + valorSeguro(feature, 'NM_MUN') + '<br>' +
+          '<b>RG_PLAN:</b> ' + valorSeguro(feature, 'RG_PLAN')
+        );
+      }
+    }).addTo(map);
+  }
+
+  function limparCamadasRegras() {
+    for (var i = 0; i < regraLayers.length; i++) {
+      map.removeLayer(regraLayers[i]);
+    }
+    regraLayers = [];
+  }
+
+  function comparar(valorFeature, comparador, valorRegra) {
+    if (comparador === '=') return String(valorFeature) === String(valorRegra);
+    if (comparador === '>') return numeroSeguro(valorFeature) > numeroSeguro(valorRegra);
+    if (comparador === '>=') return numeroSeguro(valorFeature) >= numeroSeguro(valorRegra);
+    if (comparador === '<') return numeroSeguro(valorFeature) < numeroSeguro(valorRegra);
+    if (comparador === '<=') return numeroSeguro(valorFeature) <= numeroSeguro(valorRegra);
+    return false;
+  }
+
+  function regraAtendida(feature, regra) {
+    var condicoes = regra.regra.condicoes || [];
+    var op = regra.regra.op || 'AND';
+
+    if (op === 'OR') {
+      for (var i = 0; i < condicoes.length; i++) {
+        var c = condicoes[i];
+        if (!servicosAtivos[c.grupo]) continue;
+        if (comparar(valorSeguro(feature, c.campo), c.comparador, c.valor)) return true;
+      }
+      return false;
+    }
+
+    for (var j = 0; j < condicoes.length; j++) {
+      var c2 = condicoes[j];
+      if (!servicosAtivos[c2.grupo]) return false;
+      if (!comparar(valorSeguro(feature, c2.campo), c2.comparador, c2.valor)) return false;
+    }
+    return true;
   }
 
   function construirPopupLinha(feature) {
     var p = feature.properties || {};
+    var partes = [];
+
+    if (valorSeguro(feature, 'DPJ.SV')) partes.push('Projetos: ' + valorSeguro(feature, 'DPJ.SV'));
+    if (valorSeguro(feature, 'TES.LIC.SV')) partes.push('Tesouro Licitação: ' + valorSeguro(feature, 'TES.LIC.SV'));
+    if (valorSeguro(feature, 'TES.AND.SV')) partes.push('Tesouro em Andamento: ' + valorSeguro(feature, 'TES.AND.SV'));
+    if (valorSeguro(feature, 'FUN.AND.SV')) partes.push('FUNDEINFRA em Andamento: ' + valorSeguro(feature, 'FUN.AND.SV'));
+    if (valorSeguro(feature, 'FUN.LIC.SV')) partes.push('FUNDEINFRA em Licitação: ' + valorSeguro(feature, 'FUN.LIC.SV'));
+    if (numeroSeguro(valorSeguro(feature, 'FEDER')) === 1) partes.push('Federalização');
+    if (numeroSeguro(valorSeguro(feature, 'PMR')) > 0) partes.push('Microrrevestimento');
+
+    if (partes.length === 0) partes.push('Sem serviço classificado');
+
     return (
       '<b>SRE:</b> ' + (p.sre || p.SRE || '') + '<br>' +
       '<b>Município:</b> ' + (p.NM_MUN || '') + '<br>' +
       '<b>Rodovia:</b> ' + (p.rodovia || '') + '<br>' +
       '<b>Trecho:</b> ' + (p.trecho_go || '') + '<br><br>' +
-      '<b>Serviços:</b><br>' + descricaoServicosLinha(feature)
+      '<b>Serviços:</b><br>' + partes.join('<br>')
     );
   }
 
-  function construirLayerCategoria(features, cor) {
+  function construirLayerNormal(features, cor, espessura) {
     return L.geoJSON({
       type: 'FeatureCollection',
       features: features
@@ -703,109 +988,177 @@
       style: function() {
         return {
           color: cor,
-          weight: 4.55,
+          weight: espessura,
           opacity: 0.95
         };
       },
       onEachFeature: function(feature, layer) {
         layer.bindPopup(construirPopupLinha(feature));
       }
-    }).addTo(map);
+    });
+  }
+
+  function construirLayerLinhaBranca(features, cor, espessura) {
+    var pesoBase = espessura + 2;
+    var pesoTopo = Math.max(2, espessura - 1);
+
+    var base = L.geoJSON({
+      type: 'FeatureCollection',
+      features: features
+    }, {
+      style: function() {
+        return {
+          color: cor,
+          weight: pesoBase,
+          opacity: 0.95
+        };
+      },
+      onEachFeature: function(feature, layer) {
+        layer.bindPopup(construirPopupLinha(feature));
+      }
+    });
+
+    var topo = L.geoJSON({
+      type: 'FeatureCollection',
+      features: features
+    }, {
+      style: function() {
+        return {
+          color: '#ffffff',
+          weight: pesoTopo,
+          opacity: 1
+        };
+      },
+      onEachFeature: function(feature, layer) {
+        layer.bindPopup(construirPopupLinha(feature));
+      }
+    });
+
+    return L.layerGroup([base, topo]);
+  }
+
+  function renderizarLegendaServicos() {
+    var alvo = document.getElementById('legendaServicos');
+    alvo.innerHTML = '';
+
+    var regrasLegenda = REGRAS_ESTILO.slice().sort(function(a, b) {
+      return a.prioridade - b.prioridade;
+    });
+
+    for (var i = 0; i < regrasLegenda.length; i++) {
+      var regra = regrasLegenda[i];
+      var item = document.createElement('div');
+      item.className = 'legenda-item';
+
+      if (regra.tipo_linha === 'COM LINHA BRANCA') {
+        item.innerHTML =
+          '<span class="legenda-linha-wrap">' +
+            '<span class="legenda-linha-projeto-base" style="height:' + (regra.espessura + 2) + 'px;background:' + regra.cor + ';"></span>' +
+            '<span class="legenda-linha-projeto-topo" style="height:' + Math.max(2, regra.espessura - 1) + 'px;"></span>' +
+          '</span>' +
+          regra.legenda;
+      } else {
+        item.innerHTML =
+          '<span class="legenda-linha-wrap">' +
+            '<span class="legenda-linha" style="height:' + regra.espessura + 'px;background:' + regra.cor + ';"></span>' +
+          '</span>' +
+          regra.legenda;
+      }
+
+      alvo.appendChild(item);
+    }
+  }
+
+  function zoomParaGoias() {
+    var bounds = L.geoJSON(municipiosData).getBounds();
+    if (bounds.isValid()) {
+      map.fitBounds(bounds, {
+        paddingTopLeft: [40, 40],
+        paddingBottomRight: [40, 40]
+      });
+    }
+  }
+
+  function zoomParaSelecao(features) {
+    if (!features || !features.length) {
+      zoomParaGoias();
+      return;
+    }
+
+    var bounds = L.geoJSON({
+      type: 'FeatureCollection',
+      features: features
+    }).getBounds();
+
+    if (bounds.isValid()) {
+      map.fitBounds(bounds, {
+        paddingTopLeft: [40, 40],
+        paddingBottomRight: [40, 40]
+      });
+    }
   }
 
   function desenharLinhasEPontos(featuresMunicipios) {
-    limparCamadasSRE();
+    limparCamadasRegras();
+
     if (oaeLayer) {
       map.removeLayer(oaeLayer);
       oaeLayer = null;
     }
 
     var nomesMunicipios = [];
-    var i, f, nome;
-
-    for (i = 0; i < featuresMunicipios.length; i++) {
-      nome = valorSeguro(featuresMunicipios[i], 'NM_MUN');
-      if (nome && nomesMunicipios.indexOf(nome) === -1) {
-        nomesMunicipios.push(nome);
-      }
+    for (var i = 0; i < featuresMunicipios.length; i++) {
+      var nome = valorSeguro(featuresMunicipios[i], 'NM_MUN');
+      if (nome && nomesMunicipios.indexOf(nome) === -1) nomesMunicipios.push(nome);
     }
 
     var haFiltroMunicipal = nomesMunicipios.length > 0 && nomesMunicipios.length < municipiosData.features.length;
-    var ativosServico = servicosLinearesSelecionados();
 
     var linhasBase = [];
-    for (i = 0; i < sreData.features.length; i++) {
-      f = sreData.features[i];
-      nome = valorSeguro(f, 'NM_MUN');
-
-      if (!haFiltroMunicipal || nomesMunicipios.indexOf(nome) >= 0) {
+    for (var j = 0; j < sreData.features.length; j++) {
+      var f = sreData.features[j];
+      var nm = valorSeguro(f, 'NM_MUN');
+      if (!haFiltroMunicipal || nomesMunicipios.indexOf(nm) >= 0) {
         linhasBase.push(f);
       }
     }
 
-    var pavimentacao = [];
-    var duplicacao = [];
-    var restauracao = [];
-    var melhoria = [];
-    var federalizacao = [];
-    var microrrevestimento = [];
-
     var idsUnicos = {};
+    var regrasDesenho = REGRAS_ESTILO.slice().sort(function(a, b) {
+      return b.prioridade - a.prioridade;
+    });
 
-    function idLinha(feature, idx) {
-      var props = feature.properties || {};
-      return props.SRE_MUN_ID || props.SRE_ID || props.SRE_MUN || props.sre || props.SRE || ('idx_' + idx);
+    for (var r = 0; r < regrasDesenho.length; r++) {
+      var regra = regrasDesenho[r];
+      var selecionadas = [];
+
+      for (var k = 0; k < linhasBase.length; k++) {
+        var feat = linhasBase[k];
+        if (regraAtendida(feat, regra)) {
+          selecionadas.push(feat);
+          var props = feat.properties || {};
+          var idLinha = props.SRE_MUN_ID || props.SRE_ID || props.SRE_MUN || props.sre || props.SRE || ('idx_' + k);
+          idsUnicos[idLinha] = true;
+        }
+      }
+
+      if (!selecionadas.length) continue;
+
+      var camada = (regra.tipo_linha === 'COM LINHA BRANCA')
+        ? construirLayerLinhaBranca(selecionadas, regra.cor, regra.espessura)
+        : construirLayerNormal(selecionadas, regra.cor, regra.espessura);
+
+      camada.addTo(map);
+      regraLayers.push(camada);
     }
-
-    for (i = 0; i < linhasBase.length; i++) {
-      f = linhasBase[i];
-      var exibiu = false;
-
-      if (linhaTemCategoria(f, 'pavimentacao', ativosServico)) {
-        pavimentacao.push(f);
-        exibiu = true;
-      }
-      if (linhaTemCategoria(f, 'duplicacao', ativosServico)) {
-        duplicacao.push(f);
-        exibiu = true;
-      }
-      if (linhaTemCategoria(f, 'restauracao', ativosServico)) {
-        restauracao.push(f);
-        exibiu = true;
-      }
-      if (linhaTemCategoria(f, 'melhoria', ativosServico)) {
-        melhoria.push(f);
-        exibiu = true;
-      }
-      if (linhaTemCategoria(f, 'federalizacao', ativosServico)) {
-        federalizacao.push(f);
-        exibiu = true;
-      }
-      if (linhaTemCategoria(f, 'microrrevestimento', ativosServico)) {
-        microrrevestimento.push(f);
-        exibiu = true;
-      }
-
-      if (exibiu) {
-        idsUnicos[idLinha(f, i)] = true;
-      }
-    }
-
-    if (pavimentacao.length) sreLayers.pavimentacao = construirLayerCategoria(pavimentacao, '#ff0000');
-    if (duplicacao.length) sreLayers.duplicacao = construirLayerCategoria(duplicacao, '#0000ff');
-    if (restauracao.length) sreLayers.restauracao = construirLayerCategoria(restauracao, '#00d61f');
-    if (melhoria.length) sreLayers.melhoria = construirLayerCategoria(melhoria, '#f39c12');
-    if (federalizacao.length) sreLayers.federalizacao = construirLayerCategoria(federalizacao, '#d9ef22');
-    if (microrrevestimento.length) sreLayers.microrrevestimento = construirLayerCategoria(microrrevestimento, '#e44de8');
 
     var pontos = [];
-    if (oaeAtiva()) {
-      for (i = 0; i < oaeData.features.length; i++) {
-        f = oaeData.features[i];
-        nome = valorSeguro(f, 'NM_MUN');
-
-        if (!haFiltroMunicipal || nomesMunicipios.indexOf(nome) >= 0) {
-          pontos.push(f);
+    if (oaeFiltroAtivo) {
+      for (var p = 0; p < oaeData.features.length; p++) {
+        var fp = oaeData.features[p];
+        var nomeP = valorSeguro(fp, 'NM_MUN');
+        if (!haFiltroMunicipal || nomesMunicipios.indexOf(nomeP) >= 0) {
+          pontos.push(fp);
         }
       }
 
@@ -817,12 +1170,12 @@
           return marcadorLosango(latlng, corOAE(valorSeguro(feature, 'EIXO')));
         },
         onEachFeature: function(feature, layer) {
-          var p = feature.properties || {};
+          var p2 = feature.properties || {};
           layer.bindPopup(
-            '<b>OAE:</b> ' + (p.NOME || p.NM_OAE || p.DESCRICAO || '') + '<br>' +
-            '<b>Município:</b> ' + (p.NM_MUN || '') + '<br>' +
-            '<b>SRE:</b> ' + (p.SRE || '') + '<br>' +
-            '<b>Eixo:</b> ' + nomeTipoOAE(p.EIXO)
+            '<b>OAE:</b> ' + (p2.NOME || p2.NM_OAE || p2.DESCRICAO || '') + '<br>' +
+            '<b>Município:</b> ' + (p2.NM_MUN || '') + '<br>' +
+            '<b>SRE:</b> ' + (p2.SRE || '') + '<br>' +
+            '<b>Eixo:</b> ' + nomeTipoOAE(p2.EIXO)
           );
         }
       }).addTo(map);
@@ -831,44 +1184,42 @@
     document.getElementById('countMunicipios').textContent = featuresMunicipios.length;
     document.getElementById('countLinhas').textContent = Object.keys(idsUnicos).length;
     document.getElementById('countOAE').textContent = pontos.length;
-
-    var camadas = [];
-    if (destaqueLayer) camadas.push(destaqueLayer);
-    for (var chave in sreLayers) {
-      if (sreLayers[chave]) camadas.push(sreLayers[chave]);
-    }
-    if (oaeLayer) camadas.push(oaeLayer);
-
-    var grupo = L.featureGroup(camadas);
-    if (grupo.getBounds().isValid()) {
-      map.fitBounds(grupo.getBounds(), {
-        paddingTopLeft: [30, 30],
-        paddingBottomRight: [30, 30]
-      });
-    }
   }
 
   function aplicarFiltros() {
     var feats = municipiosFiltrados();
     var municipioSelecionado = document.getElementById('municipioSelect').value;
 
-    desenharDestaqueMunicipios(feats);
+    desenharEstados();
+    desenharMunicipiosBase(feats);
     desenharLinhasEPontos(feats);
     atualizarIndicadoresProgramaMunicipio(municipioSelecionado);
+    atualizarIndicadoresServicoEOAE(municipioSelecionado);
+
+    if (feats.length > 0 && feats.length < municipiosData.features.length) {
+      zoomParaSelecao(feats);
+    } else {
+      zoomParaGoias();
+    }
   }
 
   function limparTudo() {
     document.getElementById('rgPlanSelect').value = '';
     document.getElementById('municipioSelect').value = '';
-    document.getElementById('toggleOAE').checked = true;
     programaAtivo = '';
     resetarBotoesPrograma();
 
-    var checks = document.querySelectorAll('.servico-linear');
-    var i;
-    for (i = 0; i < checks.length; i++) {
-      checks[i].checked = true;
+    for (var chave in servicosAtivos) {
+      servicosAtivos[chave] = true;
     }
+    oaeFiltroAtivo = true;
+
+    var botoesServico = document.querySelectorAll('.servico-btn');
+    for (var i = 0; i < botoesServico.length; i++) {
+      botoesServico[i].classList.add('ativo-filtro');
+    }
+
+    document.getElementById('toggleOAE').classList.add('ativo-filtro');
 
     atualizarMunicipiosPorRegiao();
     aplicarFiltros();
@@ -884,10 +1235,6 @@
     aplicarFiltros();
   });
 
-  document.getElementById('toggleOAE').addEventListener('change', function() {
-    aplicarFiltros();
-  });
-
   document.getElementById('aplicarFiltros').addEventListener('click', function() {
     aplicarFiltros();
   });
@@ -897,8 +1244,7 @@
   });
 
   var botoesPrograma = document.querySelectorAll('.programa-btn');
-  var iBot;
-  for (iBot = 0; iBot < botoesPrograma.length; iBot++) {
+  for (var iBot = 0; iBot < botoesPrograma.length; iBot++) {
     botoesPrograma[iBot].addEventListener('click', function() {
       var prog = this.getAttribute('data-programa');
 
@@ -919,32 +1265,41 @@
     });
   }
 
-  var checksServico = document.querySelectorAll('.servico-linear');
-  var iCheck;
-  for (iCheck = 0; iCheck < checksServico.length; iCheck++) {
-    checksServico[iCheck].addEventListener('change', function() {
+  var botoesServico = document.querySelectorAll('.servico-btn');
+  for (var iServ = 0; iServ < botoesServico.length; iServ++) {
+    botoesServico[iServ].addEventListener('click', function() {
+      var chave = this.getAttribute('data-servico');
+      servicosAtivos[chave] = !servicosAtivos[chave];
       aplicarFiltros();
     });
   }
 
+  document.getElementById('toggleOAE').addEventListener('click', function() {
+    oaeFiltroAtivo = !oaeFiltroAtivo;
+    aplicarFiltros();
+  });
+
   Promise.all([
     fetch('municipios.geojson').then(function(r) { return r.json(); }),
     fetch('sre_linhas.geojson').then(function(r) { return r.json(); }),
-    fetch('oae_pontos.geojson').then(function(r) { return r.json(); })
+    fetch('oae_pontos.geojson').then(function(r) { return r.json(); }),
+    fetch('estados.geojson')
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .catch(function() { return null; })
   ]).then(function(resultado) {
     municipiosData = resultado[0];
     sreData = resultado[1];
     oaeData = resultado[2];
+    estadosData = resultado[3];
 
     preencherRGPlan();
     preencherMunicipios();
-    desenharMunicipiosBase();
-    aplicarFiltros();
+    renderizarLegendaServicos();
+    limparTudo();
   }).catch(function(e) {
     console.error(e);
-    alert('Erro ao carregar arquivos. Confira os nomes: municipios.geojson, sre_linhas.geojson e oae_pontos.geojson');
+    alert('Erro ao carregar arquivos. Verifique se estão na mesma pasta: municipios.geojson, sre_linhas.geojson e oae_pontos.geojson');
   });
 </script>
-
 </body>
 </html>
