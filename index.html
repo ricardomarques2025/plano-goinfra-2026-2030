@@ -123,16 +123,11 @@
       justify-content: center;
     }
 
-    .filtro-btn.ativo-filtro {
+    .filtro-btn.ativo-filtro,
+    .filtro-btn.ativo-municipio {
       background: #1f2937;
       color: #ffffff;
       border-color: #1f2937;
-    }
-
-    .filtro-btn.ativo-municipio {
-      background: #d4af37;
-      color: #000000;
-      border-color: #a07f14;
     }
 
     .contador {
@@ -205,14 +200,17 @@
 
     @media (max-width: 980px) {
       #app {
+        display: grid;
         grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
+        grid-template-rows: auto 50vh auto;
+        height: 100vh;
       }
 
       #sidebar-left,
       #sidebar-right {
         height: auto;
-        max-height: 34vh;
+        max-height: none;
+        overflow-y: visible;
       }
 
       #sidebar-left {
@@ -226,7 +224,12 @@
       }
 
       #map-wrap {
-        height: 32vh;
+        height: 50vh;
+        min-height: 50vh;
+      }
+
+      #map {
+        height: 100%;
       }
     }
   </style>
@@ -725,30 +728,48 @@
   function atualizarIndicadoresProgramaMunicipio(nomeMunicipio) {
     resetarBotoesPrograma();
 
-    if (!nomeMunicipio) {
-      if (programaAtivo) {
-        var botaoFiltro = document.querySelector('.programa-btn[data-programa="' + programaAtivo + '"]');
-        if (botaoFiltro) botaoFiltro.classList.add('ativo-filtro');
+    var disponiveis = {
+      GME: false,
+      GMK: false,
+      GMM: false,
+      GMP: false,
+      GPP: false,
+      PMR: false
+    };
+
+    if (nomeMunicipio) {
+      var municipioFeature = null;
+
+      for (var i = 0; i < municipiosData.features.length; i++) {
+        if (valorSeguro(municipiosData.features[i], 'NM_MUN') === nomeMunicipio) {
+          municipioFeature = municipiosData.features[i];
+          break;
+        }
       }
+
+      if (municipioFeature) {
+        for (var j = 0; j < programas.length; j++) {
+          var prog = programas[j];
+          if (numeroPrograma(municipioFeature, prog) > 0) {
+            disponiveis[prog] = true;
+          }
+        }
+      }
+
+      var botoesPrograma = document.querySelectorAll('.programa-btn');
+      for (var k = 0; k < botoesPrograma.length; k++) {
+        var chave = botoesPrograma[k].getAttribute('data-programa');
+        if (disponiveis[chave]) {
+          botoesPrograma[k].classList.add('ativo-filtro');
+        }
+      }
+
       return;
     }
 
-    var municipioFeature = null;
-    for (var i = 0; i < municipiosData.features.length; i++) {
-      if (valorSeguro(municipiosData.features[i], 'NM_MUN') === nomeMunicipio) {
-        municipioFeature = municipiosData.features[i];
-        break;
-      }
-    }
-
-    if (!municipioFeature) return;
-
-    for (var j = 0; j < programas.length; j++) {
-      var prog = programas[j];
-      var botao = document.querySelector('.programa-btn[data-programa="' + prog + '"]');
-      if (botao && numeroPrograma(municipioFeature, prog) > 0) {
-        botao.classList.add('ativo-municipio');
-      }
+    if (programaAtivo) {
+      var botaoFiltro = document.querySelector('.programa-btn[data-programa="' + programaAtivo + '"]');
+      if (botaoFiltro) botaoFiltro.classList.add('ativo-filtro');
     }
   }
 
@@ -788,26 +809,32 @@
           break;
         }
       }
+
+      var botoesServico = document.querySelectorAll('.servico-btn');
+      for (var k = 0; k < botoesServico.length; k++) {
+        var chave = botoesServico[k].getAttribute('data-servico');
+        if (servicosDisponiveis[chave]) {
+          botoesServico[k].classList.add('ativo-filtro');
+        }
+      }
+
+      if (oaeDisponivel) {
+        document.getElementById('toggleOAE').classList.add('ativo-filtro');
+      }
+
+      return;
     }
 
-    var botoesServico = document.querySelectorAll('.servico-btn');
-    for (var k = 0; k < botoesServico.length; k++) {
-      var chave = botoesServico[k].getAttribute('data-servico');
-
-      if (servicosAtivos[chave]) {
-        botoesServico[k].classList.add('ativo-filtro');
-      }
-      if (nomeMunicipio && servicosDisponiveis[chave]) {
-        botoesServico[k].classList.add('ativo-municipio');
+    var botoesServicoGerais = document.querySelectorAll('.servico-btn');
+    for (var x = 0; x < botoesServicoGerais.length; x++) {
+      var chaveGeral = botoesServicoGerais[x].getAttribute('data-servico');
+      if (servicosAtivos[chaveGeral]) {
+        botoesServicoGerais[x].classList.add('ativo-filtro');
       }
     }
 
-    var botaoOAE = document.getElementById('toggleOAE');
     if (oaeFiltroAtivo) {
-      botaoOAE.classList.add('ativo-filtro');
-    }
-    if (nomeMunicipio && oaeDisponivel) {
-      botaoOAE.classList.add('ativo-municipio');
+      document.getElementById('toggleOAE').classList.add('ativo-filtro');
     }
   }
 
@@ -1213,13 +1240,6 @@
       servicosAtivos[chave] = true;
     }
     oaeFiltroAtivo = true;
-
-    var botoesServico = document.querySelectorAll('.servico-btn');
-    for (var i = 0; i < botoesServico.length; i++) {
-      botoesServico[i].classList.add('ativo-filtro');
-    }
-
-    document.getElementById('toggleOAE').classList.add('ativo-filtro');
 
     atualizarMunicipiosPorRegiao();
     aplicarFiltros();
