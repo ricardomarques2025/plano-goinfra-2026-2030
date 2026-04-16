@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <title>PLANO GOINFRA 2026 - 2030</title>
+  <title>PLANO GOINFRA<span>2026 - 2030</span></title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
@@ -13,31 +13,45 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      font-family: Arial, sans-serif;
-      background: #f3f4f6;
+      font-family: Inter, Arial, sans-serif;
+      background: linear-gradient(135deg, #9ec0c8 0%, #dfe7dd 52%, #f1efe8 100%);
+      color: #1b1b1b;
     }
 
     #app {
       display: grid;
-      grid-template-columns: 360px 1fr 360px;
+      grid-template-columns: 330px 1fr 320px;
+      gap: 16px;
       height: 100vh;
       width: 100vw;
+      padding: 18px;
     }
 
     #sidebar-left,
     #sidebar-right {
-      height: 100vh;
+      height: calc(100vh - 36px);
       overflow-y: auto;
-      background: #ffffff;
-      padding: 16px;
+      overflow-x: hidden;
+      background: rgba(255,255,255,0.88);
+      padding: 18px 12px 18px 18px;
+      border-radius: 26px;
+      border: 1px solid rgba(255,255,255,0.65);
+      box-shadow: 0 18px 38px rgba(0,0,0,0.08);
+      backdrop-filter: blur(8px);
+      background-clip: padding-box;
     }
 
-    #sidebar-left { border-right: 1px solid #d1d5db; }
-    #sidebar-right { border-left: 1px solid #d1d5db; }
+    #sidebar-left { border-right: none; }
+    #sidebar-right { border-left: none; }
 
     #map-wrap {
       min-width: 0;
-      height: 100vh;
+      height: calc(100vh - 36px);
+      border-radius: 30px;
+      overflow: hidden;
+      border: 4px solid rgba(255,255,255,0.5);
+      box-shadow: 0 18px 42px rgba(0,0,0,0.10);
+      background: rgba(255,255,255,0.72);
     }
 
     #map {
@@ -47,30 +61,46 @@
 
     .titulo {
       font-size: 20px;
-      font-weight: 700;
+      font-weight: 800;
       text-align: center;
-      margin-bottom: 14px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid #e5e7eb;
-      color: #111827;
+      margin-bottom: 18px;
+      padding: 18px 16px;
+      border-radius: 28px;
+      border-bottom: none;
+      color: #111111;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+      letter-spacing: 0.3px;
+      line-height: 1.3;
+    }
+
+    .titulo span {
+      display: block;
+      font-size: 16px;
+      font-weight: 700;
+      margin-top: 4px;
     }
 
     .bloco {
       margin-bottom: 16px;
-      padding-bottom: 14px;
-      border-bottom: 1px solid #e5e7eb;
+      padding: 14px;
+      border-radius: 22px;
+      background: rgba(255,255,255,0.72);
+      border: 1px solid rgba(0,0,0,0.04);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.05);
     }
 
     .bloco:last-child {
-      border-bottom: none;
       margin-bottom: 0;
     }
 
     .subtitulo {
       font-size: 13px;
-      font-weight: 700;
-      color: #111827;
-      margin: 0 0 8px 0;
+      font-weight: 800;
+      color: #4b5563;
+      margin: 0 0 10px 0;
+      text-transform: none;
+      letter-spacing: 0.2px;
     }
 
     label {
@@ -78,17 +108,18 @@
       font-size: 13px;
       font-weight: 700;
       margin-bottom: 6px;
-      color: #111827;
+      color: #374151;
     }
 
     select, button {
       width: 100%;
-      padding: 9px 10px;
+      padding: 12px 14px;
       font-size: 14px;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      background: #fff;
+      border: 1px solid #d8ddd9;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.96);
       margin-bottom: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
     }
 
     button {
@@ -108,32 +139,36 @@
     }
 
     .filtro-btn {
-      border: 1px solid #9ca3af;
-      background: #f3f4f6;
-      padding: 10px 6px;
+      border: 1px solid #d8ddd9;
+      background: rgba(255,255,255,0.94);
+      padding: 12px 8px;
       cursor: pointer;
-      border-radius: 8px;
+      border-radius: 14px;
       font-size: 12px;
       font-weight: 700;
-      color: #111827;
+      color: #171717;
       text-align: center;
-      min-height: 46px;
+      min-height: 48px;
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: all .18s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     }
 
     .filtro-btn.ativo-filtro,
     .filtro-btn.ativo-municipio {
-      background: #1f2937;
+      background: #0f1210;
       color: #ffffff;
-      border-color: #1f2937;
+      border-color: #0f1210;
+      box-shadow: 0 12px 20px rgba(0,0,0,0.14);
     }
 
     .contador {
       font-size: 13px;
-      line-height: 1.6;
-      color: #374151;
+      line-height: 1.7;
+      color: #4b5563;
+      padding-top: 4px;
     }
 
     .legenda-item {
@@ -219,7 +254,29 @@
     .legenda-texto {
       flex: 1;
     }
-@media (max-width: 1200px) {
+
+    .scroll-inner {
+      padding-right: 8px;
+    }
+
+    
+    .grid-servicos {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      align-items: stretch;
+    }
+    .grid-servicos .filtro-btn {
+      width: 100% !important;
+      min-width: 0;
+      min-height: 56px;
+      white-space: normal;
+      word-break: break-word;
+      text-align: center;
+      justify-content: center;
+    }
+
+    @media (max-width: 1200px) {
       #app {
         grid-template-columns: 320px 1fr 320px;
       }
@@ -231,6 +288,8 @@
         grid-template-columns: 1fr;
         grid-template-rows: auto 50vh auto;
         height: 100vh;
+        gap: 10px;
+        padding: 10px;
       }
 
       #sidebar-left,
@@ -255,6 +314,8 @@
         min-height: 50vh;
       }
 
+      
+
       #map {
         height: 100%;
       }
@@ -263,7 +324,7 @@
 </head>
 <body>
 <div id="app">
-  <aside id="sidebar-left">
+  <aside id="sidebar-left"><div class="scroll-inner">
     <div class="titulo">PLANO GOINFRA 2026 - 2030</div>
 
     <div class="bloco">
@@ -300,7 +361,7 @@
       </div>
 
       <div class="subtitulo">Serviços lineares</div>
-      <div class="grid-botoes" id="servicosLinearesBotoes">
+      <div class="grid-servicos" id="servicosLinearesBotoes">
         <button class="filtro-btn servico-btn ativo-filtro" data-servico="DPJ" type="button">Projetos</button>
         <button class="filtro-btn servico-btn ativo-filtro" data-servico="TES_LIC" type="button">Tesouro Licitação</button>
         <button class="filtro-btn servico-btn ativo-filtro" data-servico="TES_AND" type="button">Tesouro em Andamento</button>
@@ -330,149 +391,31 @@
         OAE: <span id="countOAE">0</span>
       </div>
     </div>
-  </aside>
+  </div></aside>
 
   <main id="map-wrap">
     <div id="map"></div>
   </main>
 
-  <aside id="sidebar-right">
+  <aside id="sidebar-right"><div class="scroll-inner">
     <div class="bloco">
       <div class="subtitulo">Legenda — Serviços lineares</div>
       <div id="legendaServicos"></div>
     </div>
 
-    <div class="bloco">
+    <div class="bloco" id="blocoLegendaOAE">
       <div class="subtitulo">Legenda — Obras de Arte Especiais</div>
-
-      <div class="legenda-item">
-        <span class="legenda-simbolo" style="background:#00ffff;"></span>
-        <div class="legenda-texto"><b>Eixo 1</b> — Manutenção e restauração de pontes em rodovias pavimentadas</div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-simbolo" style="background:#ffff00;"></span>
-        <div class="legenda-texto"><b>Eixo 2</b> — GPP - Programa Goiás de Ponta a Ponte</div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-simbolo" style="background:#ff0000;"></span>
-        <div class="legenda-texto"><b>Eixo 3</b> — Obras firmadas em parcerias com entes externos</div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-simbolo" style="background:#2f80ed;"></span>
-        <div class="legenda-texto"><b>Eixo 4</b> — Novas Obras Estaduais</div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-simbolo" style="background:#00ff00;"></span>
-        <div class="legenda-texto"><b>Eixo 5</b> — GME - Programa Goiás em Movimento Estruturas</div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-simbolo" style="background:#ff4dc4;"></span>
-        <div class="legenda-texto"><b>Eixo 6</b> — GMK - Programa Goiás em Movimento Kalunga</div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-simbolo" style="background:#8B5A00;"></span>
-        <div class="legenda-texto"><b>Bueiro</b></div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-simbolo" style="background:#999999;"></span>
-        <div class="legenda-texto"><b>Viaduto</b></div>
-      </div>
+      <div id="legendaOAE"></div>
     </div>
 
-    <div class="bloco">
+    <div class="bloco" id="blocoLegendaRodEst">
       <div class="subtitulo">Legenda — Rodovia Estadual</div>
-
-      <div class="legenda-item">
-        <span class="legenda-linha-wrap">
-          <span class="legenda-linha-dup-base" style="height:1px;background:#ef2020;"></span>
-          <span class="legenda-linha-dup-miolo" style="height:1px;"></span>
-        </span>
-        <div class="legenda-texto"><b>DUP</b></div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-linha-wrap">
-          <span class="legenda-linha" style="height:1px;background:#ef2020;"></span>
-        </span>
-        <div class="legenda-texto"><b>PAV</b></div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-linha-wrap">
-          <span class="legenda-linha-eod-base" style="height:3px;background:#ef2020;"></span>
-          <span class="legenda-linha-eod-miolo" style="border-top:1px dashed #ef2020; background:transparent; height:0;"></span>
-        </span>
-        <div class="legenda-texto"><b>EOD</b></div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-linha-wrap">
-          <span class="legenda-linha-eod-base" style="height:1px;background:#ef2020;"></span>
-          <span class="legenda-linha-eod-miolo" style="border-top:1px dashed #ef2020; background:transparent; height:0;"></span>
-        </span>
-        <div class="legenda-texto"><b>EOP</b></div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-linha-wrap">
-          <span class="legenda-linha" style="height:1px;background:#f08a00;"></span>
-        </span>
-        <div class="legenda-texto"><b>IMP</b></div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-linha-wrap">
-          <span class="legenda-linha" style="height:1px;background:#f08a00;"></span>
-        </span>
-        <div class="legenda-texto"><b>LEN</b></div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-linha-wrap">
-          <span class="legenda-linha" style="height:1px;background:#000000;"></span>
-        </span>
-        <div class="legenda-texto"><b>PLA</b></div>
-      </div>
+      <div id="legendaRodEst"></div>
     </div>
 
-    <div class="bloco">
+    <div class="bloco" id="blocoLegendaRodFed">
       <div class="subtitulo">Legenda — Rodovia Federal</div>
-
-      <div class="legenda-item">
-        <span class="legenda-linha-wrap">
-          <span class="legenda-linha-federal-dup-base" style="height:1px;background:#33a21a;"></span>
-          <span class="legenda-linha-federal-dup-miolo" style="height:1px;"></span>
-        </span>
-        <div class="legenda-texto"><b>DUP</b></div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-linha-wrap">
-          <span class="legenda-linha" style="height:1px;background:#e59b00;"></span>
-        </span>
-        <div class="legenda-texto"><b>LEN</b></div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-linha-wrap">
-          <span class="legenda-linha legenda-linha-tracejada" style="border-top-color:#33a21a;"></span>
-        </span>
-        <div class="legenda-texto"><b>EOP</b></div>
-      </div>
-
-      <div class="legenda-item">
-        <span class="legenda-linha-wrap">
-          <span class="legenda-linha" style="height:3px;background:#33a21a;"></span>
-        </span>
-        <div class="legenda-texto"><b>PAV</b></div>
-      </div>
+      <div id="legendaRodFed"></div>
     </div>
   </aside>
 </div>
@@ -1216,9 +1159,9 @@
   function desenharSREBase() {
     if (!sreBaseFiltroAtivo) {
       if (sreBaseLayer) { map.removeLayer(sreBaseLayer); sreBaseLayer = null; }
-      return;
+      return {};
     }
-    if (!sreBaseData || !sreBaseData.features) return;
+    if (!sreBaseData || !sreBaseData.features) return {};
     if (sreBaseLayer) map.removeLayer(sreBaseLayer);
 
     var dup = [];
@@ -1315,14 +1258,23 @@
     addSimple(pla, { color:'#000000', weight:2.2, opacity:0.95 });
 
     sreBaseLayer = grupo.addTo(map);
+    var vis = {};
+    if (dup.length) vis.DUP = true;
+    if (pav.length) vis.PAV = true;
+    if (eod.length) vis.EOD = true;
+    if (eop.length) vis.EOP = true;
+    if (imp.length) vis.IMP = true;
+    if (len.length) vis.LEN = true;
+    if (pla.length) vis.PLA = true;
+    return vis;
   }
 
   function desenharSNV() {
     if (!snvFiltroAtivo) {
       if (snvLayer) { map.removeLayer(snvLayer); snvLayer = null; }
-      return;
+      return {};
     }
-    if (!snvData || !snvData.features) return;
+    if (!snvData || !snvData.features) return {};
     if (snvLayer) map.removeLayer(snvLayer);
 
     function estiloSNV(feature) {
@@ -1438,6 +1390,13 @@
     }
 
     snvLayer = grupo.addTo(map);
+    var vis = {};
+    if (dup.length) vis.DUP = true;
+    pavLenEop.forEach(function(f) {
+      var s = String(valorSeguro(f, 'SITUACAO')).toUpperCase();
+      if (s) vis[s] = true;
+    });
+    return vis;
   }
 
   function comparar(valorFeature, comparador, valorRegra) {
@@ -1553,23 +1512,79 @@
     return L.layerGroup([base, topo]);
   }
 
-  function renderizarLegendaServicos() {
-    var alvo = document.getElementById('legendaServicos');
+
+  const OAE_LEGENDA_INFO = {
+    1: { cor: '#00ffff', titulo: 'Eixo 1', desc: 'Manutenção e restauração de pontes em rodovias pavimentadas' },
+    2: { cor: '#ffff00', titulo: 'Eixo 2', desc: 'GPP - Programa Goiás de Ponta a Ponte' },
+    3: { cor: '#ff0000', titulo: 'Eixo 3', desc: 'Obras firmadas em parcerias com entes externos' },
+    4: { cor: '#2f80ed', titulo: 'Eixo 4', desc: 'Novas Obras Estaduais' },
+    5: { cor: '#00ff00', titulo: 'Eixo 5', desc: 'GME - Programa Goiás em Movimento Estruturas' },
+    6: { cor: '#ff4dc4', titulo: 'Eixo 6', desc: 'GMK - Programa Goiás em Movimento Kalunga' },
+    100: { cor: '#8B5A00', titulo: 'Bueiro', desc: '' },
+    101: { cor: '#999999', titulo: 'Viaduto', desc: '' }
+  };
+
+  const ROD_EST_INFO = {
+    DUP: { label: 'Duplicada', tipo: 'dup', cor: '#ef2020' },
+    PAV: { label: 'Pavimentada', tipo: 'simple', cor: '#ef2020' },
+    EOD: { label: 'Em Obras de Duplicação', tipo: 'dashed-red', cor: '#ef2020' },
+    EOP: { label: 'Em Obras de Pavimentação', tipo: 'dashed-red', cor: '#ef2020' },
+    IMP: { label: 'Implantada', tipo: 'simple', cor: '#f08a00' },
+    LEN: { label: 'Leito Natural', tipo: 'simple', cor: '#f08a00' },
+    PLA: { label: 'PLA', tipo: 'simple', cor: '#000000' }
+  };
+
+  const ROD_FED_INFO = {
+    DUP: { label: 'Duplicada', tipo: 'dup', cor: '#33a21a' },
+    LEN: { label: 'Leito Natural', tipo: 'simple', cor: '#e59b00' },
+    EOP: { label: 'Em Obras de Pavimentação', tipo: 'dashed-green', cor: '#33a21a' },
+    PAV: { label: 'Pavimentada', tipo: 'simple', cor: '#33a21a' }
+  };
+
+  function criarLegendaLinha(tipo, cor) {
+    if (tipo === 'dup') {
+      return '<span class="legenda-linha-wrap">' +
+        '<span class="legenda-linha-dup-base" style="height:1px;background:' + cor + ';"></span>' +
+        '<span class="legenda-linha-dup-miolo" style="height:1px;"></span>' +
+      '</span>';
+    }
+    if (tipo === 'dashed-red') {
+      return '<span class="legenda-linha-wrap">' +
+        '<span class="legenda-linha-eod-base" style="height:1px;background:' + cor + ';"></span>' +
+        '<span class="legenda-linha-eod-miolo" style="border-top:1px dashed ' + cor + '; background:transparent; height:0;"></span>' +
+      '</span>';
+    }
+    if (tipo === 'dashed-green') {
+      return '<span class="legenda-linha-wrap">' +
+        '<span class="legenda-linha legenda-linha-tracejada" style="border-top-color:' + cor + '; border-top-width:1px;"></span>' +
+      '</span>';
+    }
+    return '<span class="legenda-linha-wrap">' +
+      '<span class="legenda-linha" style="height:1px;background:' + cor + ';"></span>' +
+    '</span>';
+  }
+
+  function renderizarLegendaServicos(legendasVisiveis) {
+    var alvo = document.getElementById('legendaServicos'); if(!alvo) return;
+    var bloco = document.getElementById('legendaServicos').closest('.bloco');
     alvo.innerHTML = '';
 
     var regrasLegenda = REGRAS_ESTILO.slice().sort(function(a, b) {
       return a.prioridade - b.prioridade;
     });
 
+    var total = 0;
     for (var i = 0; i < regrasLegenda.length; i++) {
       var regra = regrasLegenda[i];
+      if (legendasVisiveis && !legendasVisiveis[regra.legenda]) continue;
+      total++;
       var item = document.createElement('div');
       item.className = 'legenda-item';
 
       if (regra.tipo_linha === 'COM LINHA BRANCA') {
         item.innerHTML =
           '<span class="legenda-linha-wrap">' +
-            '<span class="legenda-linha-projeto-base" style="height:' + (regra.espessura + 2) + 'px;background:' + regra.cor + ';"></span>' +
+            '<span class="legenda-linha-projeto-base" style="height:' + 9 + 'px;background:' + regra.cor + ';"></span>' +
             '<span class="legenda-linha-projeto-topo" style="height:' + 4.5 + 'px;"></span>' +
           '</span>' +
           regra.legenda;
@@ -1583,7 +1598,81 @@
 
       alvo.appendChild(item);
     }
+    bloco.style.display = total > 0 ? '' : 'none';
   }
+
+  function renderizarLegendaOAE(eixosVisiveis) {
+    var alvo = document.getElementById('legendaOAE'); if(!alvo) return;
+    var bloco = document.getElementById('blocoLegendaOAE');
+    alvo.innerHTML = '';
+    var total = 0;
+    var ordem = [1,2,3,4,5,6,100,101];
+    for (var i = 0; i < ordem.length; i++) {
+      var e = ordem[i];
+      if (!eixosVisiveis || !eixosVisiveis[e]) continue;
+      total++;
+      var info = OAE_LEGENDA_INFO[e];
+      var item = document.createElement('div');
+      item.className = 'legenda-item';
+      item.innerHTML = '<span class="legenda-simbolo" style="background:' + info.cor + ';"></span>' +
+        '<div class="legenda-texto"><b>' + info.titulo + '</b>' + (info.desc ? ' — ' + info.desc : '') + '</div>';
+      alvo.appendChild(item);
+    }
+    bloco.style.display = total > 0 ? '' : 'none';
+  }
+
+  function renderizarLegendaRodEst(situacoesVisiveis) {
+    var bloco = document.getElementById('blocoLegendaRodEst');
+    var alvo = document.getElementById('legendaRodEst');
+    if (!bloco || !alvo) return;
+    if (typeof sreBaseFiltroAtivo !== 'undefined' && !sreBaseFiltroAtivo) {
+      alvo.innerHTML = '';
+      bloco.style.display = 'none';
+      return;
+    }
+    
+    alvo.innerHTML = '';
+    var ordem = ['DUP','PAV','EOD','EOP','IMP','LEN','PLA'];
+    var total = 0;
+    for (var i = 0; i < ordem.length; i++) {
+      var s = ordem[i];
+      if (!situacoesVisiveis || !situacoesVisiveis[s]) continue;
+      total++;
+      var info = ROD_EST_INFO[s];
+      var item = document.createElement('div');
+      item.className = 'legenda-item';
+      item.innerHTML = criarLegendaLinha(info.tipo, info.cor) + '<div class="legenda-texto"><b>' + info.label + '</b></div>';
+      alvo.appendChild(item);
+    }
+    bloco.style.display = total > 0 ? '' : 'none';
+  }
+
+  function renderizarLegendaRodFed(situacoesVisiveis) {
+    var bloco = document.getElementById('blocoLegendaRodFed');
+    var alvo = document.getElementById('legendaRodFed');
+    if (!bloco || !alvo) return;
+    if (typeof snvFiltroAtivo !== 'undefined' && !snvFiltroAtivo) {
+      alvo.innerHTML = '';
+      bloco.style.display = 'none';
+      return;
+    }
+    
+    alvo.innerHTML = '';
+    var ordem = ['DUP','LEN','EOP','PAV'];
+    var total = 0;
+    for (var i = 0; i < ordem.length; i++) {
+      var s = ordem[i];
+      if (!situacoesVisiveis || !situacoesVisiveis[s]) continue;
+      total++;
+      var info = ROD_FED_INFO[s];
+      var item = document.createElement('div');
+      item.className = 'legenda-item';
+      item.innerHTML = criarLegendaLinha(info.tipo, info.cor) + '<div class="legenda-texto"><b>' + info.label + '</b></div>';
+      alvo.appendChild(item);
+    }
+    bloco.style.display = total > 0 ? '' : 'none';
+  }
+
 
   function zoomParaGoias() {
     var bounds = L.geoJSON(municipiosData).getBounds();
@@ -1622,8 +1711,8 @@
       oaeLayer = null;
     }
 
-    desenharSNV();
-    desenharSREBase();
+    var situacoesFedVisiveis = desenharSNV();
+    var situacoesEstVisiveis = desenharSREBase();
 
     var nomesMunicipios = [];
     for (var i = 0; i < featuresMunicipios.length; i++) {
@@ -1637,6 +1726,10 @@
     if (!sreData || !sreData.features) {
       document.getElementById('countLinhas').textContent = '0';
       document.getElementById('countOAE').textContent = '0';
+      renderizarLegendaServicos({});
+      renderizarLegendaOAE({});
+      renderizarLegendaRodEst(situacoesEstVisiveis || {});
+      renderizarLegendaRodFed(situacoesFedVisiveis || {});
       return;
     }
 
@@ -1649,6 +1742,7 @@
     }
 
     var idsUnicos = {};
+    var servicosVisiveis = {};
     var regrasDesenho = REGRAS_ESTILO.slice().sort(function(a, b) {
       return b.prioridade - a.prioridade;
     });
@@ -1669,6 +1763,8 @@
 
       if (!selecionadas.length) continue;
 
+      servicosVisiveis[regra.legenda] = true;
+
       var camada = (regra.tipo_linha === 'COM LINHA BRANCA')
         ? construirLayerLinhaBranca(selecionadas, regra.cor, regra.espessura)
         : construirLayerNormal(selecionadas, regra.cor, regra.espessura);
@@ -1678,12 +1774,14 @@
     }
 
     var pontos = [];
+    var eixosVisiveis = {};
     if (oaeFiltroAtivo) {
       for (var p = 0; p < oaeData.features.length; p++) {
         var fp = oaeData.features[p];
         var nomeP = valorSeguro(fp, 'NM_MUN');
         if (!haFiltroMunicipal || nomesMunicipios.indexOf(nomeP) >= 0) {
           pontos.push(fp);
+          eixosVisiveis[Number(valorSeguro(fp, 'EIXO'))] = true;
         }
       }
 
@@ -1710,6 +1808,11 @@
     document.getElementById('countMunicipios').textContent = featuresMunicipios.length;
     document.getElementById('countLinhas').textContent = Object.keys(idsUnicos).length;
     document.getElementById('countOAE').textContent = pontos.length;
+
+    renderizarLegendaServicos(servicosVisiveis);
+    renderizarLegendaOAE(eixosVisiveis);
+    renderizarLegendaRodEst(situacoesEstVisiveis);
+    renderizarLegendaRodFed(situacoesFedVisiveis);
   }
 
   function aplicarFiltros() {
@@ -1734,6 +1837,11 @@
     } else {
       zoomParaGoias();
     }
+
+    var blocoFed = document.getElementById('blocoLegendaRodFed');
+    if (blocoFed && !snvFiltroAtivo) blocoFed.style.display = 'none';
+    var blocoEst = document.getElementById('blocoLegendaRodEst');
+    if (blocoEst && !sreBaseFiltroAtivo) blocoEst.style.display = 'none';
   }
 
 
@@ -1758,6 +1866,15 @@
     if (sreBaseLayer) { map.removeLayer(sreBaseLayer); sreBaseLayer = null; }
     if (oaeLayer) { map.removeLayer(oaeLayer); oaeLayer = null; }
     limparCamadasRegras();
+
+    var b1 = document.getElementById('blocoLegendaRodFed');
+    var b2 = document.getElementById('blocoLegendaRodEst');
+    var b3 = document.getElementById('blocoLegendaOAE');
+    var b4 = document.getElementById('legendaServicos') ? document.getElementById('legendaServicos').closest('.bloco') : null;
+    if (b1) b1.style.display = 'none';
+    if (b2) b2.style.display = 'none';
+    if (b3) b3.style.display = 'none';
+    if (b4) b4.style.display = 'none';
 
     desenharEstados();
     desenharMunicipiosBase(municipiosFiltrados());
@@ -1920,7 +2037,6 @@
     preencherMunicipios();
     preencherRodovias();
     preencherSREs();
-    renderizarLegendaServicos();
     limparTudo();
   }).catch(function(e) {
     console.error('Falha detalhada no carregamento:', e);
